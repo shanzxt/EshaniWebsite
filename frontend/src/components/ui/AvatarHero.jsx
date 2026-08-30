@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import { motion, useMotionValue, useSpring, useTransform, useReducedMotion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import InteractiveAvatar from "./InteractiveAvatar";
-import { Magnetic } from "../primitives";
+import { Magnetic } from "../../primitives";
 
 /**
  * AvatarHero

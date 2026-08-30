@@ -27,7 +27,7 @@ import {
   useTheme,
 } from "./primitives";
 import "./App.css";
-import AvatarHero from "./components/AvatarHero";
+import AvatarHero from "./components/ui/AvatarHero";
 
 /* ========================================================================
    Content
