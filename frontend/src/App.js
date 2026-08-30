@@ -118,7 +118,7 @@ function NameBand() {
     <section className="name-band" ref={ref} aria-label="Eshani Somwanshi" data-testid="name-band">
       <NameLine className="name-solid" x={x1}>ESHANI</NameLine>
       <span className="line-indent"><NameLine className="name-outline" x={x2} delay={0.12}>SOMWANSHI</NameLine></span>
-      <Reveal delay={0.2}><p className="name-sub">Product / UX Designer — Chicago, IL</p></Reveal>
+      <Reveal delay={0.35}><p className="name-sub">Healthcare · AI · Enterprise — Chicago, IL</p></Reveal>
     </section>
   );
 }
@@ -153,12 +153,10 @@ function Hero({ go }) {
   const yBack = useTransform(scrollYProgress, [0, 1], [0, -46]);
   const yMid = useTransform(scrollYProgress, [0, 1], [0, -90]);
   const yFront = useTransform(scrollYProgress, [0, 1], [0, -150]);
-  const yPortrait = useTransform(scrollYProgress, [0, 1], [0, -110]);
   const mx = useSpring(useMotionValue(0), { stiffness: 60, damping: 18 });
   const xBack = useTransform(mx, (v) => v * 8);
   const xMid = useTransform(mx, (v) => v * 18);
   const xFront = useTransform(mx, (v) => v * 30);
-  const xPortrait = useTransform(mx, (v) => v * 22);
   const onMouse = (e) => { if (!reduced) mx.set((e.clientX / window.innerWidth - 0.5) * 2); };
   const line = (text, delay, key) => (
     <span className="line" key={key}>
@@ -194,10 +192,6 @@ function Hero({ go }) {
           <motion.div className="frag frag-tvl" style={reduced ? {} : { y: yFront, x: xFront }}
             initial={reduced ? false : { clipPath: "inset(0 100% 0 0)" }} animate={{ clipPath: "inset(0 0% 0 0)" }} transition={{ duration: 0.9, delay: 0.55, ease: EASE }}>
             <img src={IMG("travelogue-cover.png")} alt="" data-testid="hero-frag-travelogue" />
-          </motion.div>
-          <motion.div className="frag frag-portrait" style={reduced ? {} : { y: yPortrait, x: xPortrait }}
-            initial={reduced ? false : { clipPath: "inset(100% 0 0 0)" }} animate={{ clipPath: "inset(0% 0 0 0)" }} transition={{ duration: 0.9, delay: 0.7, ease: EASE }}>
-            <img src={IMG("profile.png")} alt="" data-testid="hero-frag-portrait" />
           </motion.div>
           <motion.span className="hero-stage-note" initial={reduced ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.62, delay: 0.85 }}>Selected interface work</motion.span>
         </div>
@@ -252,11 +246,7 @@ function CaseStudy({ go }) {
             <p>Diagnostic workflows and automated reporting for a B2B health-tech platform MVP, enabling clinicians to complete diagnostic tasks 20% faster while maintaining compliance in a regulated environment.</p></Reveal>
           <div className="chapter-art">
             <div className="native">
-              <Wipe src={IMG("eyeai-dashboard.png")} alt="Eye AI clinician dashboard listing patients, clinical details and report status in a sortable table." testId="case-image-dashboard" />
-              <figcaption>Patient and report management for the clinician</figcaption>
-            </div>
-            <div className="native">
-              <Wipe src={IMG("eyeai-cover.png")} alt="Eye AI product site introducing AI-assisted diagnostic technology for clinicians." delay={0.1} testId="case-image-cover" />
+              <Wipe src={IMG("eyeai-cover.png")} alt="Eye AI product site introducing AI-assisted diagnostic technology for clinicians." testId="case-image-cover" />
               <figcaption>Product site — onboarding clinicians to the platform</figcaption>
             </div>
           </div>
@@ -398,6 +388,7 @@ export default function App() {
       </div>
 
       <main id="main">
+        <NameBand />
         <Hero go={go} />
 
         <section className="proof-strip" aria-label="Selected outcomes">
@@ -630,8 +621,6 @@ export default function App() {
             </Reveal>
           </div>
         </section>
-
-        <NameBand />
 
         <section className="section contact" id="contact" style={{ paddingTop: 0 }}>
           <div className="marquee" aria-hidden="true">

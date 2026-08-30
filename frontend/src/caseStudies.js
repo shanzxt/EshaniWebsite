@@ -28,7 +28,6 @@ export const caseStudies = [
       { label: "Research", title: "Where clinicians lose time.", body: "Heuristic evaluation and competitive analysis across 15+ stakeholder workshops set the design direction through three product pivots. Findings were fed directly into sprint priorities and roadmap sequencing — research shaped what got built, not just how it looked." },
       { label: "Method", title: "A defined path from research to handoff.", body: "Journey mapping through wireframing, iterative prototyping, and high-fidelity delivery. User-centered prototyping and early usability validation compressed the MVP timeline from 10 to 7 weeks and eliminated 5 high-severity interaction issues before engineering commitment." },
       { label: "Interface", title: "The clinician's four minutes.", body: "The final workflow lets clinicians move from patient queue to diagnostic report in minutes: a clear patient table with status at a glance, guided upload and analysis, and automated reporting that holds up in a regulated environment — enabling diagnostic tasks to be completed 20% faster.", images: [
-        ["eyeai-dashboard.png", "Eye AI clinician dashboard listing patients, clinical details and report status in a sortable table.", "Patient and report management for the clinician"],
         ["eyeai-cover.png", "Eye AI product site introducing AI-assisted diagnostic technology for clinicians.", "Product site — onboarding clinicians to the platform"],
       ] },
     ],

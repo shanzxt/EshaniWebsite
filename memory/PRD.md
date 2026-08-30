@@ -41,6 +41,7 @@ Redesign the portfolio to be simple, clear, aesthetic, and catchy, taking inspir
 - Tool logo marquee (Figma, Framer, Miro, Adobe, HTML5, JS, Perplexity, Claude, Cursor, ChatGPT) under Capabilities, theme-aware monochrome via simple-icons CDN.
 - Supporting projects restyled as sticky stacking cards.
 - 2026-07 (round 3.5): Portrait woven into the hero as a fourth parallax fragment (tilted, front layer, own scroll/mouse depth, bottom-up reveal).
+- 2026-07 (round 4): Reverted hero portrait per user; removed blurry Eye-AI dashboard image from home case section and case-study page (kept only the sharp product-site image); moved the giant ESHANI/SOMWANSHI name band to the top of the page as the opening moment.
 
 ## Prioritized backlog
 - P1: Add RESEND_API_KEY to backend/.env so contact enquiries also land in the email inbox.
