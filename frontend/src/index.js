@@ -6,6 +6,12 @@ import "@/index.css";
 import App from "@/App";
 import CaseStudyPage from "@/CaseStudyPage";
 
+// Lenis controls scroll position, so the browser's own restoration fights it
+// on back/forward navigation.
+if ("scrollRestoration" in window.history) {
+  window.history.scrollRestoration = "manual";
+}
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

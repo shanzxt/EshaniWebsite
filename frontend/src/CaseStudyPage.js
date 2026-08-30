@@ -1,23 +1,72 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { Link, useParams } from "react-router-dom";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion, useScroll } from "framer-motion";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
-import { EASE, IMG, Reveal, ThemeSwitch, Wipe, useTheme } from "./primitives";
+import Lenis from "lenis";
+import {
+  EASE,
+  IMG,
+  Reveal,
+  ThemeSwitch,
+  Wipe,
+  useTheme,
+} from "./primitives";
 import { caseStudies } from "./caseStudies";
+import "./App.css";
 
 export default function CaseStudyPage() {
   const { slug } = useParams();
   const [theme, setTheme] = useTheme();
   const reduced = useReducedMotion();
+  const lenisRef = useRef(null);
+  const { scrollYProgress } = useScroll();
   const study = caseStudies.find((s) => s.slug === slug);
 
-  useEffect(() => { window.scrollTo(0, 0); }, [slug]);
+  // Same momentum scrolling as the home page — without this the case pages
+  // felt like a different site.
+  useEffect(() => {
+    if (reduced) return;
+    const lenis = new Lenis({ lerp: 0.1 });
+    lenisRef.current = lenis;
+    let raf;
+    const loop = (t) => {
+      lenis.raf(t);
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => {
+      cancelAnimationFrame(raf);
+      lenis.destroy();
+      lenisRef.current = null;
+    };
+  }, [reduced]);
+
+  useEffect(() => {
+    if (lenisRef.current) lenisRef.current.scrollTo(0, { immediate: true });
+    else window.scrollTo(0, 0);
+  }, [slug]);
+
+  // Keep the document title in sync — recruiters bookmark and share these.
+  useEffect(() => {
+    const base = "Eshani Somwanshi — Product & UX Designer";
+    document.title = study
+      ? `${study.titleLines.join(" ")} — ${study.company} | Eshani Somwanshi`
+      : base;
+    return () => {
+      document.title = base;
+    };
+  }, [study]);
 
   if (!study) {
     return (
       <div className="container" style={{ paddingTop: "8rem", minHeight: "70vh" }}>
         <p className="section-label">Case study not found</p>
-        <Link to="/" className="read-case" data-testid="case-notfound-home">Back to all work <ArrowUpRight size={14} /></Link>
+        <h1 className="cs-title" style={{ marginBottom: "2rem" }}>
+          That project isn&rsquo;t here.
+        </h1>
+        <Link to="/" className="read-case" data-testid="case-notfound-home">
+          Back to all work <ArrowUpRight size={14} />
+        </Link>
       </div>
     );
   }
@@ -29,26 +78,55 @@ export default function CaseStudyPage() {
     <div data-testid={`case-page-${study.slug}`}>
       <header className="cs-header">
         <div className="container cs-header-inner">
-          <Link to="/" className="cs-back" data-testid="case-back-link"><ArrowLeft size={15} /> Selected work</Link>
+          <Link to="/" className="cs-back" data-testid="case-back-link">
+            <ArrowLeft size={15} /> Selected work
+          </Link>
           <span className="wordmark"><b>ES/</b>ESHANI SOMWANSHI</span>
           <ThemeSwitch theme={theme} setTheme={setTheme} />
         </div>
+        <motion.div
+          className="scroll-progress"
+          style={{ scaleX: scrollYProgress }}
+          aria-hidden="true"
+        />
       </header>
+
       <main>
         <section className="cs-hero container">
-          <motion.p className="eyebrow" initial={reduced ? false : { opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.62, ease: EASE }} data-testid="case-eyebrow">
+          <motion.p
+            className="eyebrow"
+            initial={reduced ? false : { opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.62, ease: EASE }}
+            data-testid="case-eyebrow"
+          >
             {study.company} · {study.period}
           </motion.p>
+
           <h1 className="cs-title" data-testid="case-title">
             {study.titleLines.map((line, i) => (
               <span className="line" key={line}>
-                <motion.span initial={reduced ? false : { y: "105%" }} animate={{ y: 0 }} transition={{ duration: 0.9, delay: 0.1 + i * 0.1, ease: EASE }}>{line}</motion.span>
+                <motion.span
+                  initial={reduced ? false : { y: "105%" }}
+                  animate={{ y: 0 }}
+                  transition={{ duration: 0.95, delay: 0.1 + i * 0.1, ease: EASE }}
+                >
+                  {line}
+                </motion.span>
               </span>
             ))}
           </h1>
-          <motion.div className="cs-meta" initial={reduced ? false : { opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.62, delay: 0.45, ease: EASE }}>
+
+          <motion.div
+            className="cs-meta"
+            initial={reduced ? false : { opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.62, delay: 0.45, ease: EASE }}
+          >
             <span className="lead-role" style={{ margin: 0 }}>{study.role}</span>
-            <div className="tag-row">{study.tags.map((t) => <span className="tag" key={t}>{t}</span>)}</div>
+            <div className="tag-row">
+              {study.tags.map((t) => <span className="tag" key={t}>{t}</span>)}
+            </div>
           </motion.div>
         </section>
 
@@ -67,7 +145,10 @@ export default function CaseStudyPage() {
           <Reveal><p className="lede">{study.overview}</p></Reveal>
           {study.confidential && (
             <Reveal delay={0.1}>
-              <p className="note-strip" data-testid="case-nda-note">This engagement is under NDA — screens aren't public yet. The process below is shareable; the pixels aren't. Happy to walk through the work live.</p>
+              <p className="note-strip" data-testid="case-nda-note">
+                This engagement is under NDA — screens aren&rsquo;t public yet. The process
+                below is shareable; the pixels aren&rsquo;t. Happy to walk through the work live.
+              </p>
             </Reveal>
           )}
         </section>
@@ -75,17 +156,34 @@ export default function CaseStudyPage() {
         {study.chapters.map((ch, i) => (
           <section className="cs-chapter container" key={ch.label} data-testid={`case-chapter-${i + 1}`}>
             <Reveal>
-              <p className="section-label">{String(i + 1).padStart(2, "0")} — {ch.label}</p>
+              <p className="section-label">
+                {String(i + 1).padStart(2, "0")} — {ch.label}
+              </p>
               <h2>{ch.title}</h2>
               <p className="cs-body">{ch.body}</p>
             </Reveal>
+
             {ch.images && (
               <div className={ch.phone ? "phone-row" : "cs-art"}>
                 {ch.images.map(([src, alt, cap], j) => (
-                  <div className={ch.phone ? "phone" : undefined} key={src}>
-                    <Wipe src={IMG(src)} alt={alt} delay={j * 0.1} testId={`case-image-${study.slug}-${j}`} />
+                  /* figcaption now lives inside its own <figure>. Previously it
+                     sat next to the Wipe <figure> as a loose sibling in a <div>,
+                     which is invalid HTML and lost the caption association. */
+                  <figure
+                    className={ch.phone ? "phone cs-shot" : "cs-shot"}
+                    key={src}
+                    data-cursor={study.company.split(" ")[0]}
+                  >
+                    <Wipe
+                      src={IMG(src)}
+                      alt={alt}
+                      delay={j * 0.1}
+                      fit="contain"
+                      zoom={false}
+                      testId={`case-image-${study.slug}-${j}`}
+                    />
                     <figcaption>{cap}</figcaption>
-                  </div>
+                  </figure>
                 ))}
               </div>
             )}
@@ -103,9 +201,10 @@ export default function CaseStudyPage() {
           </div>
         </section>
       </main>
+
       <footer className="site-footer">
         <div className="container footer-row">
-          <span>© 2026 Eshani Somwanshi</span>
+          <span>© {new Date().getFullYear()} Eshani Somwanshi</span>
           <Link to="/" data-testid="case-footer-home">Back to all work ↑</Link>
         </div>
       </footer>
