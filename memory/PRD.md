@@ -29,7 +29,17 @@ Redesign the portfolio to be simple, clear, aesthetic, and catchy, taking inspir
 - Case-study deep-dive pages at /work/:slug for all five projects: masked-reveal hero, metrics band, numbered process chapters with wipe-revealed artifacts, NDA note for confidential work, next-project footer. Routed via react-router.
 - Travelogue added as featured project in the work section plus a full case page using the five new uploaded artifacts (research quotes board, home feed, trip hub, second feed, compass field shot).
 - Contact form posting to FastAPI /api/messages (stored in MongoDB; Resend email notification to CONTACT_INBOX auto-activates when RESEND_API_KEY is set in backend/.env).
-- Resume card section with one-click PDF download (graceful email fallback until the PDF is uploaded to /app/frontend/public/resume/Eshani_Somwanshi_Resume.pdf).
+- Resume card section with one-click PDF download (live: /public/resume/Eshani_Somwanshi_Resume.pdf).
+
+## Implemented (2026-07, round 3)
+- Fixed Eye-AI dashboard blur: re-rendered at 1.3x with contrast + unsharp-mask sharpening.
+- Fixed white mats around cover artwork: image frames (.wipe/.frag/.about-photo) now have transparent backgrounds so rounded artwork corners blend with the theme.
+- Added portrait photo to the About section (profile.png, 4:5 crop).
+- Giant typographic name band (ESHANI / SOMWANSHI, outlined second line) with masked reveal + scroll-drift parallax between Resume and Contact.
+- Custom cursor (dot + trailing ring, difference blend, hover-grow) on fine-pointer devices.
+- Magnetic hover on primary CTAs.
+- Tool logo marquee (Figma, Framer, Miro, Adobe, HTML5, JS, Perplexity, Claude, Cursor, ChatGPT) under Capabilities, theme-aware monochrome via simple-icons CDN.
+- Supporting projects restyled as sticky stacking cards.
 
 ## Prioritized backlog
 - P1: Add RESEND_API_KEY to backend/.env so contact enquiries also land in the email inbox.

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { AnimatePresence, motion, useMotionValue, useMotionValueEvent, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
+import { AnimatePresence, motion, useInView, useMotionValue, useMotionValueEvent, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
 import Lenis from "lenis";
 import { ArrowUpRight, Download, Menu, Minus, Plus, Send, X } from "lucide-react";
 import { Toaster, toast } from "sonner";
@@ -54,6 +54,98 @@ const experience = [
       "Designed brand pitch decks used in client acquisition, contributing to 5+ new client wins."]],
 ];
 
+function Cursor() {
+  const reduced = useReducedMotion();
+  const [enabled, setEnabled] = useState(false);
+  const [hovering, setHovering] = useState(false);
+  const x = useMotionValue(-100);
+  const y = useMotionValue(-100);
+  const rx = useSpring(x, { stiffness: 250, damping: 22 });
+  const ry = useSpring(y, { stiffness: 250, damping: 22 });
+  useEffect(() => {
+    if (reduced || !window.matchMedia("(pointer:fine)").matches) return;
+    setEnabled(true);
+    const move = (e) => { x.set(e.clientX); y.set(e.clientY); };
+    const over = (e) => setHovering(!!e.target.closest("a,button,input,textarea"));
+    window.addEventListener("mousemove", move, { passive: true });
+    window.addEventListener("mouseover", over, { passive: true });
+    return () => { window.removeEventListener("mousemove", move); window.removeEventListener("mouseover", over); };
+  }, [reduced, x, y]);
+  if (!enabled) return null;
+  return (
+    <>
+      <motion.div className="cursor-dot" style={{ x, y }} aria-hidden="true" />
+      <motion.div className="cursor-ring" style={{ x: rx, y: ry }} data-hover={hovering} aria-hidden="true" />
+    </>
+  );
+}
+
+function Magnetic({ children, strength = 0.3 }) {
+  const ref = useRef(null);
+  const reduced = useReducedMotion();
+  const x = useSpring(useMotionValue(0), { stiffness: 200, damping: 15 });
+  const y = useSpring(useMotionValue(0), { stiffness: 200, damping: 15 });
+  const onMove = (e) => {
+    if (reduced || !ref.current) return;
+    const r = ref.current.getBoundingClientRect();
+    x.set((e.clientX - (r.left + r.width / 2)) * strength);
+    y.set((e.clientY - (r.top + r.height / 2)) * strength);
+  };
+  const reset = () => { x.set(0); y.set(0); };
+  return <motion.div ref={ref} onMouseMove={onMove} onMouseLeave={reset} style={{ x, y, display: "inline-block" }}>{children}</motion.div>;
+}
+
+function NameLine({ children, className, x, delay = 0 }) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, amount: 0.5 });
+  const reduced = useReducedMotion();
+  return (
+    <span className="line" ref={ref}>
+      <motion.span initial={reduced ? false : { y: "108%" }} animate={inView ? { y: 0 } : undefined} transition={{ duration: 1, delay, ease: EASE }}>
+        <motion.span className={`name-line ${className}`} style={reduced ? {} : { x }}>{children}</motion.span>
+      </motion.span>
+    </span>
+  );
+}
+
+function NameBand() {
+  const ref = useRef(null);
+  const reduced = useReducedMotion();
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const x1 = useTransform(scrollYProgress, [0, 1], ["3%", "-5%"]);
+  const x2 = useTransform(scrollYProgress, [0, 1], ["-3%", "5%"]);
+  return (
+    <section className="name-band" ref={ref} aria-label="Eshani Somwanshi" data-testid="name-band">
+      <NameLine className="name-solid" x={x1}>ESHANI</NameLine>
+      <span className="line-indent"><NameLine className="name-outline" x={x2} delay={0.12}>SOMWANSHI</NameLine></span>
+      <Reveal delay={0.2}><p className="name-sub">Product / UX Designer — Chicago, IL</p></Reveal>
+    </section>
+  );
+}
+
+const tools = [
+  ["figma", "Figma"], ["framer", "Framer"], ["miro", "Miro"], ["adobephotoshop", "Photoshop"],
+  ["adobeillustrator", "Illustrator"], ["html5", "HTML5"], ["javascript", "JavaScript"],
+  ["perplexity", "Perplexity"], ["anthropic", "Claude"], ["cursor", "Cursor"], ["openai", "ChatGPT"],
+];
+
+function ToolMarquee({ theme }) {
+  const ink = theme === "paper" ? "171817" : theme === "petrol" ? "E1EFF1" : "EDEDE8";
+  return (
+    <div className="tool-marquee" aria-label="Tools of the trade" data-testid="tool-marquee">
+      <div className="tool-track">
+        {[...tools, ...tools].map(([slug, name], i) => (
+          <span className="tool-tile" key={`${slug}-${i}`}>
+            <img src={`https://cdn.simpleicons.org/${slug}/${ink}`} alt="" loading="lazy"
+              onError={(e) => { e.currentTarget.style.display = "none"; }} />
+            {name}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function Hero({ go }) {
   const reduced = useReducedMotion();
   const stageRef = useRef(null);
@@ -84,8 +176,8 @@ function Hero({ go }) {
             I work across healthcare, AI, and enterprise products — using research, systems thinking, and prototyping to make complex experiences easier to understand and use.
           </motion.p>
           <motion.div className="hero-actions" initial={reduced ? false : { opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.55, ease: EASE }}>
-            <a href="#work" className="btn btn-primary" data-testid="hero-work-button" onClick={(e) => { e.preventDefault(); go("work"); }}>Explore selected work <ArrowUpRight size={15} /></a>
-            <a href="#contact" className="btn btn-secondary" data-testid="hero-email-button" onClick={(e) => { e.preventDefault(); go("contact"); }}>Get in touch</a>
+            <Magnetic><a href="#work" className="btn btn-primary" data-testid="hero-work-button" onClick={(e) => { e.preventDefault(); go("work"); }}>Explore selected work <ArrowUpRight size={15} /></a></Magnetic>
+            <Magnetic><a href="#contact" className="btn btn-secondary" data-testid="hero-email-button" onClick={(e) => { e.preventDefault(); go("contact"); }}>Get in touch</a></Magnetic>
           </motion.div>
         </div>
         <div className="hero-stage" ref={stageRef} onMouseMove={onMouse} aria-hidden="true">
@@ -271,6 +363,7 @@ export default function App() {
   return (
     <div className="portfolio-shell">
       <Toaster position="bottom-right" />
+      <Cursor />
       <header className="site-header" ref={headerRef} data-testid="portfolio-header">
         <div className="container nav-inner">
           <a href="#top" className="wordmark" data-testid="logo-link" onClick={(e) => { e.preventDefault(); go("top"); }}><b>ES/</b>ESHANI SOMWANSHI</a>
@@ -453,6 +546,9 @@ export default function App() {
                 </Reveal>
               ))}
             </div>
+            <Reveal delay={0.15}>
+              <ToolMarquee theme={theme} />
+            </Reveal>
           </div>
         </section>
 
@@ -493,8 +589,8 @@ export default function App() {
           <div className="container about-grid">
             <Reveal>
               <figure className="about-photo">
-                <Wipe src={IMG("travelogue-phones.png")} alt="Travelogue, a personal trip-planning app concept shown on two phones with upcoming trips and a photo feed." testId="about-image-travelogue" />
-                <figcaption>Personal project — Travelogue, trip-planning concept</figcaption>
+                <Wipe src={IMG("profile.png")} alt="Portrait of Eshani Somwanshi, product and UX designer." testId="about-image-portrait" />
+                <figcaption>Eshani Somwanshi — Chicago, IL</figcaption>
               </figure>
             </Reveal>
             <Reveal className="about-copy" testId="about-copy">
@@ -523,11 +619,13 @@ export default function App() {
                   <h3>Eshani Somwanshi — Résumé</h3>
                   <p>Education, experience, and verified skills in one PDF.</p>
                 </div>
-                <button className="btn btn-primary" onClick={downloadResume} data-testid="resume-download-button">Download résumé <Download size={15} /></button>
+                <Magnetic><button className="btn btn-primary" onClick={downloadResume} data-testid="resume-download-button">Download résumé <Download size={15} /></button></Magnetic>
               </div>
             </Reveal>
           </div>
         </section>
+
+        <NameBand />
 
         <section className="section contact" id="contact" style={{ paddingTop: 0 }}>
           <div className="marquee" aria-hidden="true">
@@ -542,8 +640,8 @@ export default function App() {
               <h2 data-testid="contact-heading">Have a complex product problem?</h2>
               <p className="lede">I'm interested in thoughtful product work across healthcare, AI, and systems that help people make better decisions. Send a message here — or reach out directly.</p>
               <div className="contact-actions">
-                <a href="mailto:eshani.swdesign@gmail.com" className="btn btn-secondary" data-testid="contact-email-link">Email Eshani <ArrowUpRight size={15} /></a>
-                <a href="https://www.linkedin.com/in/eshani-somwanshi/" target="_blank" rel="noopener noreferrer" className="btn btn-secondary" data-testid="contact-linkedin-link">View LinkedIn</a>
+                <Magnetic><a href="mailto:eshani.swdesign@gmail.com" className="btn btn-secondary" data-testid="contact-email-link">Email Eshani <ArrowUpRight size={15} /></a></Magnetic>
+                <Magnetic><a href="https://www.linkedin.com/in/eshani-somwanshi/" target="_blank" rel="noopener noreferrer" className="btn btn-secondary" data-testid="contact-linkedin-link">View LinkedIn</a></Magnetic>
               </div>
             </Reveal>
             <Reveal className="contact-side" testId="contact-side">
