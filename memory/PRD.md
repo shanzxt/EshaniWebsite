@@ -1,26 +1,35 @@
 # Eshani Somwanshi Portfolio
 
 ## Original problem statement
-Redesign the portfolio to be simple, clear, aesthetic, and catchy, taking inspiration from the attached Aastha Gupta portfolio. Remove blurry or unclear visuals, improve animations, and make projects, skills, and related content stick neatly while scrolling until the next section.
+Redesign the portfolio to be simple, clear, aesthetic, and catchy, taking inspiration from an attached editorial designer portfolio (sticky rails, theme switcher, chaptered case study). Fix blurry imagery: use the user's uploaded images only where they are sharp, in neat fixed-ratio frames. Improve animations, sticky behavior, and overall craft to an award-worthy level.
+
+## User choices (2026-07)
+- Keep all three themes with a switcher, exactly like the inspiration: Paper (warm light), Carbon (dark), Petrol (deep teal).
+- Review every uploaded image and use only the sharp ones, neatly cropped in fixed-ratio frames.
 
 ## Architecture decisions
-- Kept the existing React frontend and removed reliance on low-resolution project image fragments.
-- Used text-led editorial project cards, outcome metrics, responsive CSS sticky rails, and Framer Motion for restrained entrance/modal motion.
-- Kept the backend untouched because this portfolio flow is static and has no data API requirement.
+- React frontend, plain CSS design system in App.css with per-theme CSS custom properties (`data-theme` on `<html>`, persisted to localStorage).
+- framer-motion for masked line reveals, clip-path image wipes, count-ups, accordions, scroll progress; lenis for momentum scrolling.
+- User's own images only (no stock): eyeai-cover, eyeai-dashboard (clean crop from uploaded full-screen screenshot), myocircle-cover, travelogue-cover, travelogue-phones. Served from /public/images at native resolution to avoid blur.
+- Rejected uploads: VS Code screenshot, inspiration-site screenshots, Pittsburgh skyline photo (not the designer's work).
 
 ## Implemented
-- Black editorial visual system with lime accent, grain texture, strong typography, responsive layout, and light/paper theme toggle.
-- Hero, selected work, capabilities, experience, about, contact, and footer sections using the supplied portfolio facts and metrics.
-- Sticky left rails for work, capabilities, and experience on desktop; clean stacked layout on mobile.
-- Case-study modal, experience accordions, mobile navigation, contact links, anchor navigation, reduced-motion support, and unique test IDs.
-- Removed all blurry visual/image dependencies from the main portfolio experience.
+- 2026-07: Three-theme switcher (Paper/Carbon/Petrol) with swatch previews, persisted, desktop + mobile menu.
+- 2026-07: Compressing fixed header with blur and scroll-progress hairline.
+- 2026-07: Kinetic hero — masked line-by-line headline reveal, three layered image fragments with scroll + mouse parallax.
+- 2026-07: Proof strip with count-up metrics (tabular numerals).
+- 2026-07: 01 lead project panel (Rebecca Everlene, typographic, no public screens).
+- 2026-07: 02 chaptered Eye-AI case study with sticky rail, scroll-aware chapter nav, and wipe-revealed dashboard/product images.
+- 2026-07: 03 wide project (OptraHealth + MyoCircle image), 04 compact text-only project (DAB of India).
+- 2026-07: Impact index grid (12 outcomes), capabilities columns, expandable experience rows with full detail bullets.
+- 2026-07: About section with framed Travelogue personal-project image; inverted contact section with slow marquee; footer.
+- 2026-07: Lenis smooth scrolling with anchor scrolling, reduced-motion fallbacks, full data-testid coverage.
 
 ## Prioritized backlog
-- P0: None.
-- P1: Add verified high-resolution case-study visuals only when final assets are available.
-- P1: Replace contact mail links with a real submission endpoint if inbound form handling is needed.
-- P2: Add individual case-study routes with richer research artifacts.
+- P1: Individual case-study routes/modals with deeper research and process artifacts per project.
+- P2: Real contact form wired to the FastAPI backend instead of mailto links.
+- P2: Resume PDF download once the file is supplied.
 
 ## Next tasks
-- Review final copy and metrics for accuracy.
-- Supply approved sharp project images for optional case-study detail pages.
+- User review of image selection and theme palettes.
+- Optional: add Travelogue as a full fifth project if more artifacts are provided.
