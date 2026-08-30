@@ -32,7 +32,6 @@ Redesign the portfolio to be simple, clear, aesthetic, and catchy, taking inspir
 - Resume card section with one-click PDF download (graceful email fallback until the PDF is uploaded to /app/frontend/public/resume/Eshani_Somwanshi_Resume.pdf).
 
 ## Prioritized backlog
-- P1: Upload the résumé PDF to /app/frontend/public/resume/ to activate one-click download.
 - P1: Add RESEND_API_KEY to backend/.env so contact enquiries also land in the email inbox.
 - P2: Admin view for stored contact messages.
 
