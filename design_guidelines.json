@@ -1,0 +1,44 @@
+{
+  "typography": {
+    "headings": "Playfair Display, Cormorant Garamond, serif",
+    "body": "Inter, sans-serif",
+    "mono": "JetBrains Mono, monospace"
+  },
+  "colors": {
+    "background": "#0a0a0a",
+    "surface": "#141414",
+    "text_primary": "#ededed",
+    "text_muted": "#888888",
+    "accent": "#f5f5f5",
+    "border": "#262626"
+  },
+  "visual_enhancers": {
+    "grain_texture": true,
+    "sticky_rails": true,
+    "glassmorphism": "backdrop-blur-xl bg-black/70 border border-white/10",
+    "high_contrast_editorial": true
+  },
+  "component_path": "/app/frontend/src/App.js",
+  "instructions_to_main_agent": "Build an exquisite, high-end editorial portfolio for Eshani Somwanshi inspired by Aastha Gupta's black editorial portfolio. Use oversized serif headings, crisp high-contrast black & white aesthetic, sticky project & skill rails that stay fixed while scrolling through detailed text-led case studies and skill breakdown cards, accordion experience, theme switcher (dark/light), contact modal/form, and interactive case study deep-dives without relying on blurry images. Ensure 100% test-id coverage and responsive layout.",
+  "grids": {
+    "bento_portfolio": "grid grid-cols-1 lg:grid-cols-12 gap-8"
+  },
+  "layouts": {
+    "sticky_rail_layout": "grid lg:grid-cols-12 gap-12 items-start"
+  },
+  "motion": {
+    "entrance": "framer-motion fade in with stagger",
+    "scroll": "smooth lenis-style scrolling and sticky positioning"
+  },
+  "accessibility": {
+    "aria_labels": "MANDATORY for all interactive controls",
+    "focus_states": "High-contrast focus rings"
+  },
+  "image_urls": [],
+  "universal_guidelines": [
+    "Never use blurry or unclear images. Use text-led editorial cards and typographic panels.",
+    "Ensure sticky rails remain pinned during scroll until section boundary.",
+    "Every interactive element must have data-testid attributes.",
+    "Do not use complete transparent backgrounds for headers or overlays."
+  ]
+}
