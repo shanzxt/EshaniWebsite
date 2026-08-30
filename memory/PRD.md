@@ -25,11 +25,16 @@ Redesign the portfolio to be simple, clear, aesthetic, and catchy, taking inspir
 - 2026-07: About section with framed Travelogue personal-project image; inverted contact section with slow marquee; footer.
 - 2026-07: Lenis smooth scrolling with anchor scrolling, reduced-motion fallbacks, full data-testid coverage.
 
+## Implemented (2026-07, round 2)
+- Case-study deep-dive pages at /work/:slug for all five projects: masked-reveal hero, metrics band, numbered process chapters with wipe-revealed artifacts, NDA note for confidential work, next-project footer. Routed via react-router.
+- Travelogue added as featured project in the work section plus a full case page using the five new uploaded artifacts (research quotes board, home feed, trip hub, second feed, compass field shot).
+- Contact form posting to FastAPI /api/messages (stored in MongoDB; Resend email notification to CONTACT_INBOX auto-activates when RESEND_API_KEY is set in backend/.env).
+- Resume card section with one-click PDF download (graceful email fallback until the PDF is uploaded to /app/frontend/public/resume/Eshani_Somwanshi_Resume.pdf).
+
 ## Prioritized backlog
-- P1: Individual case-study routes/modals with deeper research and process artifacts per project.
-- P2: Real contact form wired to the FastAPI backend instead of mailto links.
-- P2: Resume PDF download once the file is supplied.
+- P1: Upload the résumé PDF to /app/frontend/public/resume/ to activate one-click download.
+- P1: Add RESEND_API_KEY to backend/.env so contact enquiries also land in the email inbox.
+- P2: Admin view for stored contact messages.
 
 ## Next tasks
-- User review of image selection and theme palettes.
-- Optional: add Travelogue as a full fifth project if more artifacts are provided.
+- User review of the five case-study pages and the Travelogue feature slot.

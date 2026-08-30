@@ -1,16 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { AnimatePresence, animate, motion, useInView, useMotionValue, useMotionValueEvent, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
+import { Link } from "react-router-dom";
+import { AnimatePresence, motion, useMotionValue, useMotionValueEvent, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
 import Lenis from "lenis";
-import { ArrowUpRight, Menu, Minus, Plus, X } from "lucide-react";
+import { ArrowUpRight, Download, Menu, Minus, Plus, Send, X } from "lucide-react";
+import { Toaster, toast } from "sonner";
+import { CountUp, EASE, IMG, Reveal, ThemeSwitch, Wipe, useTheme } from "./primitives";
 import "./App.css";
-
-const IMG = (name) => `${process.env.PUBLIC_URL}/images/${name}`;
-const EASE = [0.22, 0.61, 0.36, 1];
-const THEMES = [
-  { id: "paper", label: "Paper" },
-  { id: "carbon", label: "Carbon" },
-  { id: "petrol", label: "Petrol" },
-];
 
 const proof = [
   [25, "%", "Higher task completion", "Rebecca Everlene Trust Co."],
@@ -58,63 +53,6 @@ const experience = [
     ["Maintained brand standards across 1,000+ assets with an AI-assisted production workflow.",
       "Designed brand pitch decks used in client acquisition, contributing to 5+ new client wins."]],
 ];
-
-function CountUp({ value, suffix = "", comma = false }) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-8% 0px" });
-  const reduced = useReducedMotion();
-  const final = (comma ? value.toLocaleString("en-US") : value) + suffix;
-  const [display, setDisplay] = useState(reduced ? final : "0" + suffix);
-  useEffect(() => {
-    if (!inView || reduced) { if (reduced) setDisplay(final); return; }
-    const controls = animate(0, value, {
-      duration: 0.9, ease: EASE,
-      onUpdate: (v) => setDisplay((comma ? Math.round(v).toLocaleString("en-US") : Math.round(v)) + suffix),
-    });
-    return () => controls.stop();
-  }, [inView, reduced, value, suffix, comma, final]);
-  return <span ref={ref} className="num" data-testid={`countup-${value}${suffix}`}>{display}</span>;
-}
-
-export function Reveal({ children, delay = 0, className = "", testId }) {
-  const reduced = useReducedMotion();
-  return (
-    <motion.div className={className} data-testid={testId}
-      initial={reduced ? { opacity: 0 } : { opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.15 }}
-      transition={{ duration: 0.62, delay, ease: EASE }}>
-      {children}
-    </motion.div>
-  );
-}
-
-function Wipe({ src, alt, delay = 0, className = "", testId }) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, amount: 0.25 });
-  const reduced = useReducedMotion();
-  return (
-    <figure ref={ref} className={`wipe ${className}`}>
-      <motion.img src={src} alt={alt} loading="lazy" decoding="async" data-testid={testId}
-        initial={reduced ? { opacity: 0 } : { opacity: 1, clipPath: "inset(0 100% 0 0)", scale: 1.04 }}
-        animate={inView ? { opacity: 1, clipPath: "inset(0 0% 0 0)", scale: 1 } : undefined}
-        transition={{ duration: 0.9, delay, ease: EASE }} />
-    </figure>
-  );
-}
-
-function ThemeSwitch({ theme, setTheme, mobile = false }) {
-  return (
-    <div className={`theme-switch${mobile ? " theme-switch-mobile" : ""}`} role="group" aria-label="Colour theme" data-testid={mobile ? "theme-switch-mobile" : "theme-switch"}>
-      {THEMES.map((t) => (
-        <button type="button" key={t.id} className="theme-dot" data-theme-value={t.id}
-          aria-pressed={theme === t.id} onClick={() => setTheme(t.id)} data-testid={`theme-${t.id}-button`}>
-          <span className="theme-swatch" aria-hidden="true"></span><span className="theme-name">{t.label}</span>
-        </button>
-      ))}
-    </div>
-  );
-}
 
 function Hero({ go }) {
   const reduced = useReducedMotion();
@@ -199,6 +137,7 @@ function CaseStudy({ go }) {
                 onClick={(e) => { e.preventDefault(); go(id); }}><span className="n">{n}</span> {label}</a></li>
             ))}</ul>
           </nav>
+          <Link to="/work/eye-ai" className="read-case" data-testid="read-case-eye-ai" style={{ marginTop: "1.6rem" }}>Open full case study <ArrowUpRight size={14} /></Link>
         </Reveal>
       </div>
       <div className="chapter-flow">
@@ -229,21 +168,64 @@ function CaseStudy({ go }) {
   );
 }
 
+function ContactForm() {
+  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [state, setState] = useState("idle");
+  const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
+  const submit = async (e) => {
+    e.preventDefault();
+    setState("sending");
+    try {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/messages`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) throw new Error("send failed");
+      setState("sent");
+      toast.success("Message sent — thank you.");
+    } catch {
+      setState("idle");
+      toast.error("Couldn't send just now — please email me directly instead.");
+    }
+  };
+  if (state === "sent") {
+    return (
+      <div className="form-sent" data-testid="contact-form-success">
+        <b>Message received.</b>
+        Thanks for reaching out{form.name ? `, ${form.name}` : ""} — I'll get back to you at {form.email} soon.
+      </div>
+    );
+  }
+  return (
+    <form className="contact-form" onSubmit={submit} data-testid="contact-form">
+      <div className="form-field">
+        <label htmlFor="cf-name">Your name</label>
+        <input id="cf-name" required value={form.name} onChange={set("name")} data-testid="contact-form-name" autoComplete="name" />
+      </div>
+      <div className="form-field">
+        <label htmlFor="cf-email">Your email</label>
+        <input id="cf-email" type="email" required value={form.email} onChange={set("email")} data-testid="contact-form-email" autoComplete="email" />
+      </div>
+      <div className="form-field">
+        <label htmlFor="cf-message">The problem you're solving</label>
+        <textarea id="cf-message" required value={form.message} onChange={set("message")} data-testid="contact-form-message" />
+      </div>
+      <button type="submit" className="btn btn-primary" disabled={state === "sending"} data-testid="contact-form-submit" style={{ width: "fit-content" }}>
+        {state === "sending" ? "Sending…" : "Send message"} <Send size={14} />
+      </button>
+    </form>
+  );
+}
+
 export default function App() {
-  const reduced = useReducedMotion();
-  const [theme, setTheme] = useState(() => {
-    try { return localStorage.getItem("portfolio-theme") || "paper"; } catch { return "paper"; }
-  });
+  const [theme, setTheme] = useTheme();
   const [menu, setMenu] = useState(false);
   const [openExp, setOpenExp] = useState(null);
   const headerRef = useRef(null);
   const lenisRef = useRef(null);
+  const reduced = useReducedMotion();
   const { scrollY, scrollYProgress } = useScroll();
-
-  useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-    try { localStorage.setItem("portfolio-theme", theme); } catch { }
-  }, [theme]);
 
   useEffect(() => {
     if (reduced) return;
@@ -267,10 +249,28 @@ export default function App() {
     else el.scrollIntoView({ behavior: "smooth" });
   };
 
-  const navItems = [["work", "Work"], ["impact", "Impact"], ["experience", "Experience"], ["about", "About"]];
+  const downloadResume = async () => {
+    const url = `${process.env.PUBLIC_URL}/resume/Eshani_Somwanshi_Resume.pdf`;
+    try {
+      const res = await fetch(url, { method: "HEAD" });
+      if (res.ok && (res.headers.get("content-type") || "").includes("pdf")) {
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "Eshani_Somwanshi_Resume.pdf";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        return;
+      }
+    } catch { }
+    toast("The résumé PDF isn't uploaded yet — email me and I'll send it right over.");
+  };
+
+  const navItems = [["work", "Work"], ["impact", "Impact"], ["experience", "Experience"], ["about", "About"], ["resume", "Resume"]];
 
   return (
     <div className="portfolio-shell">
+      <Toaster position="bottom-right" />
       <header className="site-header" ref={headerRef} data-testid="portfolio-header">
         <div className="container nav-inner">
           <a href="#top" className="wordmark" data-testid="logo-link" onClick={(e) => { e.preventDefault(); go("top"); }}><b>ES/</b>ESHANI SOMWANSHI</a>
@@ -332,12 +332,13 @@ export default function App() {
                   <div className="lead-metrics">
                     <div><div className="m-value"><CountUp value={25} suffix="%" /></div><div className="m-label">Task completion ↑</div></div>
                     <div><div className="m-value"><CountUp value={40} suffix="%" /></div><div className="m-label">Early drop-off ↓</div></div>
-                    <div><div className="m-value"><CountUp value="50" suffix="%" /></div><div className="m-label">Time-to-prototype ↓</div></div>
+                    <div><div className="m-value"><CountUp value={50} suffix="%" /></div><div className="m-label">Time-to-prototype ↓</div></div>
                   </div>
                 </div>
                 <div className="lead-tags tag-row">
                   <span className="tag">0→1 product</span><span className="tag">Gamified learning</span><span className="tag">AI workflows</span><span className="tag">B2C</span>
                 </div>
+                <Link to="/work/rebecca-everlene" className="read-case" data-testid="read-case-rebecca" style={{ marginTop: "1.8rem" }}>Read the process <ArrowUpRight size={14} /></Link>
               </article>
             </Reveal>
           </div>
@@ -356,8 +357,8 @@ export default function App() {
         <section className="section">
           <div className="container">
             <Reveal className="section-head">
-              <div><p className="section-label">Selected work — 03 &amp; 04</p><h2>Consumer health, and brand at scale.</h2></div>
-              <p className="desc">An AI companion inside a health-tech SaaS platform, and production design across a client roster.</p>
+              <div><p className="section-label">Selected work — 03, 04 &amp; 05</p><h2>Consumer health, travel, and brand at scale.</h2></div>
+              <p className="desc">An AI companion inside a health-tech SaaS platform, a research-led travel concept, and production design across a client roster.</p>
             </Reveal>
 
             <Reveal>
@@ -374,6 +375,26 @@ export default function App() {
                     <div><div className="m-value"><CountUp value={28} suffix="%" /></div><div className="m-label">Tutorial completion ↑</div></div>
                     <div><div className="m-value"><CountUp value={100} suffix="+" /></div><div className="m-label">Component library</div></div>
                   </div>
+                  <Link to="/work/optrahealth" className="read-case" data-testid="read-case-optra">Read case study <ArrowUpRight size={14} /></Link>
+                </div>
+              </article>
+            </Reveal>
+
+            <Reveal>
+              <article className="proj proj-wide" data-testid="project-card-travelogue">
+                <div className="proj-media">
+                  <Wipe src={IMG("travelogue-cover.png")} alt="Travelogue trip-planning app shown across four phones — upcoming trips, welcome screen, photo feed and group view." testId="project-image-travelogue" />
+                </div>
+                <div className="proj-body">
+                  <div><h3>Travelogue</h3><p className="lead-role">Product Designer · Personal case study · 2025</p></div>
+                  <p className="summary">A self-initiated, research-led concept that consolidates trip planning into one home — upcoming trips, itineraries, documents, and the people coming along — shaped directly by traveler interviews about offline access, group coordination, and expense tracking.</p>
+                  <div className="tag-row"><span className="tag">Personal project</span><span className="tag">Mobile UX</span><span className="tag">Research-led</span></div>
+                  <div className="proj-metrics">
+                    <div><div className="m-value"><CountUp value={8} /></div><div className="m-label">Research insights</div></div>
+                    <div><div className="m-value"><CountUp value={3} /></div><div className="m-label">Core flows designed</div></div>
+                    <div><div className="m-value"><CountUp value={1} /></div><div className="m-label">End-to-end concept</div></div>
+                  </div>
+                  <Link to="/work/travelogue" className="read-case" data-testid="read-case-travelogue">Read case study <ArrowUpRight size={14} /></Link>
                 </div>
               </article>
             </Reveal>
@@ -385,6 +406,7 @@ export default function App() {
                   <div>
                     <p className="summary">Built an AI-assisted design workflow spanning copy, mockups, and social and print assets across 25+ clients — maintaining brand standards over 1,000+ assets, and designing brand pitch decks used directly in client acquisition.</p>
                     <div className="tag-row"><span className="tag">Brand design</span><span className="tag">AI-assisted workflow</span><span className="tag">Client work</span></div>
+                    <Link to="/work/dab-of-india" className="read-case" data-testid="read-case-dab" style={{ marginTop: "1.4rem" }}>Read case study <ArrowUpRight size={14} /></Link>
                   </div>
                   <div className="proj-metrics">
                     <div><div className="m-value"><CountUp value={25} suffix="+" /></div><div className="m-label">Clients served</div></div>
@@ -489,6 +511,24 @@ export default function App() {
           </div>
         </section>
 
+        <section className="section section-bright" id="resume">
+          <div className="container">
+            <Reveal className="section-head">
+              <div><p className="section-label">Resume</p><h2 data-testid="resume-heading">Every claim on this site, sourced.</h2></div>
+              <p className="desc">The résumé PDF is the single source of truth behind every metric and role shown above.</p>
+            </Reveal>
+            <Reveal>
+              <div className="resume-card" data-testid="resume-card">
+                <div>
+                  <h3>Eshani Somwanshi — Résumé</h3>
+                  <p>Education, experience, and verified skills in one PDF.</p>
+                </div>
+                <button className="btn btn-primary" onClick={downloadResume} data-testid="resume-download-button">Download résumé <Download size={15} /></button>
+              </div>
+            </Reveal>
+          </div>
+        </section>
+
         <section className="section contact" id="contact" style={{ paddingTop: 0 }}>
           <div className="marquee" aria-hidden="true">
             <div className="marquee-track">
@@ -500,15 +540,18 @@ export default function App() {
             <Reveal>
               <p className="eyebrow contact-eyebrow">Get in touch</p>
               <h2 data-testid="contact-heading">Have a complex product problem?</h2>
-              <p className="lede">I'm interested in thoughtful product work across healthcare, AI, and systems that help people make better decisions.</p>
+              <p className="lede">I'm interested in thoughtful product work across healthcare, AI, and systems that help people make better decisions. Send a message here — or reach out directly.</p>
               <div className="contact-actions">
-                <a href="mailto:eshani.swdesign@gmail.com" className="btn btn-primary" data-testid="contact-email-link">Email Eshani <ArrowUpRight size={15} /></a>
+                <a href="mailto:eshani.swdesign@gmail.com" className="btn btn-secondary" data-testid="contact-email-link">Email Eshani <ArrowUpRight size={15} /></a>
                 <a href="https://www.linkedin.com/in/eshani-somwanshi/" target="_blank" rel="noopener noreferrer" className="btn btn-secondary" data-testid="contact-linkedin-link">View LinkedIn</a>
               </div>
             </Reveal>
-            <Reveal className="contact-links" testId="contact-links">
-              <a href="mailto:eshani.swdesign@gmail.com" data-testid="contact-links-email"><span>Email</span><span>eshani.swdesign@gmail.com</span></a>
-              <a href="https://www.linkedin.com/in/eshani-somwanshi/" target="_blank" rel="noopener noreferrer" data-testid="contact-links-linkedin"><span>LinkedIn</span><span>/in/eshani-somwanshi</span></a>
+            <Reveal className="contact-side" testId="contact-side">
+              <ContactForm />
+              <div className="contact-links">
+                <a href="mailto:eshani.swdesign@gmail.com" data-testid="contact-links-email"><span>Email</span><span>eshani.swdesign@gmail.com</span></a>
+                <a href="https://www.linkedin.com/in/eshani-somwanshi/" target="_blank" rel="noopener noreferrer" data-testid="contact-links-linkedin"><span>LinkedIn</span><span>/in/eshani-somwanshi</span></a>
+              </div>
             </Reveal>
           </div>
         </section>

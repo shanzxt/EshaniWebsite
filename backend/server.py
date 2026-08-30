@@ -3,9 +3,10 @@ from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
+import asyncio
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, EmailStr
 from typing import List
 import uuid
 from datetime import datetime, timezone
@@ -65,6 +66,43 @@ async def get_status_checks():
             check['timestamp'] = datetime.fromisoformat(check['timestamp'])
     
     return status_checks
+
+class ContactMessageCreate(BaseModel):
+    name: str = Field(min_length=1, max_length=120)
+    email: EmailStr
+    message: str = Field(min_length=1, max_length=4000)
+
+@api_router.post("/messages")
+async def create_message(input: ContactMessageCreate):
+    doc = {
+        "id": str(uuid.uuid4()),
+        "name": input.name,
+        "email": input.email,
+        "message": input.message,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.messages.insert_one(doc)
+    resend_key = os.environ.get("RESEND_API_KEY")
+    if resend_key:
+        try:
+            import resend
+            resend.api_key = resend_key
+            html = (
+                '<table style="font-family:monospace;font-size:14px;line-height:1.7;color:#111">'
+                f'<tr><td style="padding:4px 16px 4px 0;color:#666">From</td><td>{input.name} &lt;{input.email}&gt;</td></tr>'
+                f'<tr><td style="padding:4px 16px 4px 0;color:#666;vertical-align:top">Message</td><td>{input.message}</td></tr>'
+                '</table>'
+            )
+            params = {
+                "from": os.environ.get("SENDER_EMAIL", "onboarding@resend.dev"),
+                "to": [os.environ.get("CONTACT_INBOX", "eshani.swdesign@gmail.com")],
+                "subject": f"Portfolio enquiry from {input.name}",
+                "html": html,
+            }
+            await asyncio.to_thread(resend.Emails.send, params)
+        except Exception as e:
+            logger.error(f"Email notification failed: {e}")
+    return {"status": "received", "id": doc["id"]}
 
 # Include the router in the main app
 app.include_router(api_router)
