@@ -27,6 +27,7 @@ import {
   useTheme,
 } from "./primitives";
 import "./App.css";
+import AvatarHero from "./components/AvatarHero";
 
 /* ========================================================================
    Content
@@ -727,8 +728,8 @@ export default function App() {
       </div>
 
       <main id="main">
-        <NameBand />
-        <Hero go={go} />
+        <AvatarHero go={go} theme={theme} />
+        
 
         {/* ---------- proof strip ---------- */}
         <section className="proof-strip" aria-label="Selected outcomes">
