@@ -153,10 +153,12 @@ function Hero({ go }) {
   const yBack = useTransform(scrollYProgress, [0, 1], [0, -46]);
   const yMid = useTransform(scrollYProgress, [0, 1], [0, -90]);
   const yFront = useTransform(scrollYProgress, [0, 1], [0, -150]);
+  const yPortrait = useTransform(scrollYProgress, [0, 1], [0, -110]);
   const mx = useSpring(useMotionValue(0), { stiffness: 60, damping: 18 });
   const xBack = useTransform(mx, (v) => v * 8);
   const xMid = useTransform(mx, (v) => v * 18);
   const xFront = useTransform(mx, (v) => v * 30);
+  const xPortrait = useTransform(mx, (v) => v * 22);
   const onMouse = (e) => { if (!reduced) mx.set((e.clientX / window.innerWidth - 0.5) * 2); };
   const line = (text, delay, key) => (
     <span className="line" key={key}>
@@ -192,6 +194,10 @@ function Hero({ go }) {
           <motion.div className="frag frag-tvl" style={reduced ? {} : { y: yFront, x: xFront }}
             initial={reduced ? false : { clipPath: "inset(0 100% 0 0)" }} animate={{ clipPath: "inset(0 0% 0 0)" }} transition={{ duration: 0.9, delay: 0.55, ease: EASE }}>
             <img src={IMG("travelogue-cover.png")} alt="" data-testid="hero-frag-travelogue" />
+          </motion.div>
+          <motion.div className="frag frag-portrait" style={reduced ? {} : { y: yPortrait, x: xPortrait }}
+            initial={reduced ? false : { clipPath: "inset(100% 0 0 0)" }} animate={{ clipPath: "inset(0% 0 0 0)" }} transition={{ duration: 0.9, delay: 0.7, ease: EASE }}>
+            <img src={IMG("profile.png")} alt="" data-testid="hero-frag-portrait" />
           </motion.div>
           <motion.span className="hero-stage-note" initial={reduced ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.62, delay: 0.85 }}>Selected interface work</motion.span>
         </div>

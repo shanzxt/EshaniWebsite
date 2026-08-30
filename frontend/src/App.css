@@ -102,8 +102,10 @@ button{font:inherit;background:none;border:none;cursor:pointer;color:inherit}
 .frag{position:absolute;background:transparent;border:1px solid var(--line);overflow:hidden;will-change:transform}
 .frag img{width:100%;height:100%;object-fit:cover}
 .frag-eyeai{width:104%;top:0;right:-22%;aspect-ratio:485/400;z-index:1;box-shadow:0 24px 60px -34px rgba(var(--shadow-rgb),.32)}
-.frag-myo{width:60%;top:44%;left:-12%;aspect-ratio:505/420;z-index:3;box-shadow:0 30px 70px -30px rgba(var(--shadow-rgb),.4)}
+.frag-myo{width:60%;top:36%;left:-12%;aspect-ratio:505/420;z-index:3;box-shadow:0 30px 70px -30px rgba(var(--shadow-rgb),.4)}
 .frag-tvl{width:34%;bottom:-4%;right:0;aspect-ratio:505/420;z-index:4;box-shadow:0 26px 50px -26px rgba(var(--shadow-rgb),.45)}
+.frag-portrait{width:26%;left:-3%;bottom:-5%;aspect-ratio:4/5;z-index:4;box-shadow:0 22px 48px -24px rgba(var(--shadow-rgb),.42)}
+.frag-portrait img{transform:rotate(-2.5deg) scale(1.07)}
 .hero-stage-note{position:absolute;left:0;bottom:-2.4rem;font-family:var(--font-mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 
 /* ---------- proof strip ---------- */
@@ -326,8 +328,9 @@ button{font:inherit;background:none;border:none;cursor:pointer;color:inherit}
   .hero-grid{grid-template-columns:1fr;gap:4.5rem}
   .hero-stage{max-width:560px;aspect-ratio:16/11;min-height:0}
   .frag-eyeai{width:78%;right:-6%;top:0}
-  .frag-myo{width:46%;left:-4%;top:38%}
+  .frag-myo{width:46%;left:-4%;top:30%}
   .frag-tvl{width:26%;right:2%;top:auto;bottom:-2%}
+  .frag-portrait{width:21%;left:0;bottom:0}
   .proof-grid{grid-template-columns:repeat(2,1fr);row-gap:2rem}
   .proof-item:nth-child(3){border-left:none;padding-left:0}
   .lead-body{grid-template-columns:1fr;align-items:start}
@@ -355,6 +358,7 @@ button{font:inherit;background:none;border:none;cursor:pointer;color:inherit}
   .frag-eyeai{width:94%;right:-8%;top:2%}
   .frag-myo{width:58%;left:-6%;top:auto;bottom:4%}
   .frag-tvl{width:30%;right:0;top:auto;bottom:-2%}
+  .frag-portrait{width:22%;left:2%;bottom:36%}
   .proof-grid{grid-template-columns:1fr 1fr}
   .impact-grid{grid-template-columns:1fr 1fr}
   .capabilities-grid{grid-template-columns:1fr;gap:2rem}
