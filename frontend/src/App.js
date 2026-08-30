@@ -12,7 +12,7 @@ import {
   useTransform,
 } from "framer-motion";
 import Lenis from "lenis";
-import { ArrowUpRight, Download, Menu, Minus, Plus, Send } from "lucide-react";
+import { ArrowUpRight, Menu, Minus, Plus, Send } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import {
   CountUp,
@@ -640,24 +640,6 @@ export default function App() {
 
   useEffect(() => () => document.body.classList.remove("menu-open"), []);
 
-  const downloadResume = async () => {
-    const url = `${process.env.PUBLIC_URL}/resume/Eshani_Somwanshi_Resume.pdf`;
-    try {
-      const res = await fetch(url, { method: "HEAD" });
-      if (res.ok && (res.headers.get("content-type") || "").includes("pdf")) {
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "Eshani_Somwanshi_Resume.pdf";
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        return;
-      }
-    } catch {
-      /* fall through to the toast */
-    }
-    toast("The résumé PDF isn't uploaded yet — email me and I'll send it right over.");
-  };
 
   return (
     <div className="portfolio-shell">
@@ -1146,12 +1128,18 @@ export default function App() {
               <div className="resume-card" data-testid="resume-card">
                 <div>
                   <h3>Eshani Somwanshi — Résumé</h3>
-                  <p>Education, experience, and verified skills in one PDF.</p>
+                  <p>Opens in a new tab — education, experience, and verified skills in one PDF.</p>
                 </div>
                 <Magnetic>
-                  <button className="btn btn-primary" onClick={downloadResume} data-testid="resume-download-button">
-                    Download résumé <Download size={15} />
-                  </button>
+                  <a
+                    className="btn btn-primary"
+                    href={`${process.env.PUBLIC_URL}/resume/Eshani_Somwanshi_Resume.pdf`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-testid="resume-download-button"
+                  >
+                    View résumé <ArrowUpRight size={15} />
+                  </a>
                 </Magnetic>
               </div>
             </Reveal>
