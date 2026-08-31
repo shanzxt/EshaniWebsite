@@ -2,11 +2,12 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 import { motion, useSpring, useMotionValue, useTransform } from "framer-motion";
 
 /**
- * InteractiveAvatar
- * Refined 2D stylized vector character of Eshani
- * - Fixed: Full contiguous wavy hair mass (no background gaps behind head/ears)
- * - Fixed: Elegant, natural almond-shaped eye proportions with smooth cursor tracking
- * - Features: 3D head tilt parallax, reactive swinging jhumkas, natural blinking, click speech bubble
+ * InteractiveAvatar (Ankit / uxdularia 3/4 Pixar Style)
+ * - 3/4 perspective turned slightly to the left
+ * - Cute stylized rounded head & slender angled neck
+ * - Signature warm cream eye-socket patches & large expressive tracking eyes
+ * - Gorgeous voluminous dark wavy curls with clean bold vector flow
+ * - Golden bindi, silver jhumka earring, cute blushed button nose, and white embroidered kurta
  */
 export default function InteractiveAvatar({
   className = "",
@@ -18,37 +19,36 @@ export default function InteractiveAvatar({
   const leftEyeRef = useRef(null);
   const rightEyeRef = useRef(null);
 
-  // Blinking & expressions
+  // Blinking & interactions
   const [isBlinking, setIsBlinking] = useState(false);
   const [isWinking, setIsWinking] = useState(false);
   const [isHappy, setIsHappy] = useState(false);
   const [speechBubble, setSpeechBubble] = useState("");
 
-  // Raw normalized mouse coordinates (-1 to 1)
+  // Normalized mouse coordinates (-1 to 1)
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
-  // Smooth springs for head tilt & parallax
-  const springConfig = { stiffness: 120, damping: 18, mass: 0.6 };
+  // Springs for smooth head tilt and parallax
+  const springConfig = { stiffness: 100, damping: 16, mass: 0.55 };
   const smoothX = useSpring(mouseX, springConfig);
   const smoothY = useSpring(mouseY, springConfig);
 
-  // Head 3D tilt & shift
-  const headRotateY = useTransform(smoothX, [-1, 1], [-7, 7]);
-  const headRotateX = useTransform(smoothY, [-1, 1], [5, -5]);
-  const headTranslateX = useTransform(smoothX, [-1, 1], [-8, 8]);
-  const headTranslateY = useTransform(smoothY, [-1, 1], [-5, 5]);
+  // 3D Parallax Tilt
+  const headRotateY = useTransform(smoothX, [-1, 1], [-8, 8]);
+  const headRotateX = useTransform(smoothY, [-1, 1], [6, -6]);
+  const headTranslateX = useTransform(smoothX, [-1, 1], [-10, 10]);
+  const headTranslateY = useTransform(smoothY, [-1, 1], [-6, 6]);
 
-  // Subtle hair parallax depth
-  const backHairX = useTransform(smoothX, [-1, 1], [4, -4]);
-  const frontHairX = useTransform(smoothX, [-1, 1], [-10, 10]);
+  // Hair parallax
+  const backHairX = useTransform(smoothX, [-1, 1], [5, -5]);
+  const frontHairX = useTransform(smoothX, [-1, 1], [-12, 12]);
 
-  // Earrings reactive physics swing
-  const earringLeftRotate = useTransform(smoothX, [-1, 1], [-10, 14]);
-  const earringRightRotate = useTransform(smoothX, [-1, 1], [-14, 10]);
+  // Jhumka earring swing
+  const earringRotate = useTransform(smoothX, [-1, 1], [-14, 18]);
 
-  // Eyebrow reactive lift
-  const eyebrowY = useTransform(smoothY, [-1, 1], [-2.5, 1.5]);
+  // Eyebrow lift
+  const eyebrowY = useTransform(smoothY, [-1, 1], [-3, 2]);
 
   // Pupil offsets (clamped)
   const [leftPupil, setLeftPupil] = useState({ x: 0, y: 0 });
@@ -61,7 +61,7 @@ export default function InteractiveAvatar({
     const leftRect = leftEyeRef.current.getBoundingClientRect();
     const rightRect = rightEyeRef.current.getBoundingClientRect();
 
-    const calcEye = (rect, maxRadius = 7.5) => {
+    const calcEye = (rect, maxRadius = 8.5) => {
       const eyeCenterX = rect.left + rect.width / 2;
       const eyeCenterY = rect.top + rect.height / 2;
 
@@ -70,18 +70,18 @@ export default function InteractiveAvatar({
       const angle = Math.atan2(dy, dx);
       const distance = Math.hypot(dx, dy);
 
-      const radius = Math.min(maxRadius, distance / 28);
+      const radius = Math.min(maxRadius, distance / 22);
       return {
         x: Math.cos(angle) * radius,
-        y: Math.sin(angle) * radius * 0.8
+        y: Math.sin(angle) * radius * 0.85
       };
     };
 
-    setLeftPupil(calcEye(leftRect, 7.5));
-    setRightPupil(calcEye(rightRect, 7.5));
+    setLeftPupil(calcEye(leftRect, 8));
+    setRightPupil(calcEye(rightRect, 9));
   }, []);
 
-  // Global mouse move listener
+  // Global mouse move tracking
   useEffect(() => {
     if (!interactive) return;
 
@@ -111,15 +111,15 @@ export default function InteractiveAvatar({
     idleInterval = setInterval(() => {
       if (Date.now() - lastMoveTime > 4000) {
         const t = Date.now() / 1500;
-        const autoX = Math.sin(t) * 0.35;
-        const autoY = Math.cos(t * 0.7) * 0.2;
+        const autoX = Math.sin(t) * 0.4;
+        const autoY = Math.cos(t * 0.7) * 0.25;
         mouseX.set(autoX);
         mouseY.set(autoY);
 
         if (containerRef.current) {
           const rect = containerRef.current.getBoundingClientRect();
-          const fakeTargetX = rect.left + rect.width / 2 + autoX * 250;
-          const fakeTargetY = rect.top + rect.height / 2 + autoY * 180;
+          const fakeTargetX = rect.left + rect.width / 2 + autoX * 280;
+          const fakeTargetY = rect.top + rect.height / 2 + autoY * 200;
           updatePupils(fakeTargetX, fakeTargetY);
         }
       }
@@ -137,7 +137,7 @@ export default function InteractiveAvatar({
     };
   }, [interactive, mouseX, mouseY, updatePupils]);
 
-  // Natural blinking cycle
+  // Natural blinking
   useEffect(() => {
     let blinkTimeout;
     const triggerBlink = () => {
@@ -147,12 +147,12 @@ export default function InteractiveAvatar({
         if (Math.random() < 0.25) {
           setTimeout(() => {
             setIsBlinking(true);
-            setTimeout(() => setIsBlinking(false), 140);
-          }, 180);
+            setTimeout(() => setIsBlinking(false), 130);
+          }, 170);
         }
-      }, 160);
+      }, 150);
 
-      const nextBlink = 3200 + Math.random() * 3500;
+      const nextBlink = 3000 + Math.random() * 3500;
       blinkTimeout = setTimeout(triggerBlink, nextBlink);
     };
 
@@ -160,7 +160,7 @@ export default function InteractiveAvatar({
     return () => clearTimeout(blinkTimeout);
   }, []);
 
-  // Avatar click micro-interaction
+  // Avatar click interaction
   const handleClick = () => {
     setIsWinking(true);
     setIsHappy(true);
@@ -189,7 +189,7 @@ export default function InteractiveAvatar({
         position: "relative",
         width: "100%",
         maxWidth: `${size}px`,
-        aspectRatio: "420 / 520",
+        aspectRatio: "440 / 520",
         margin: "0 auto",
         cursor: "pointer",
         userSelect: "none",
@@ -198,7 +198,7 @@ export default function InteractiveAvatar({
       title="Click me!"
       data-testid="interactive-avatar"
     >
-      {/* Speech bubble popup */}
+      {/* Speech bubble */}
       {speechBubble && (
         <motion.div
           initial={{ opacity: 0, y: 10, scale: 0.9 }}
@@ -241,70 +241,62 @@ export default function InteractiveAvatar({
         </motion.div>
       )}
 
-      {/* Main SVG Vector Character */}
+      {/* Main SVG Graphic */}
       <svg
-        viewBox="0 0 420 520"
+        viewBox="0 0 440 520"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         style={{
           width: "100%",
           height: "100%",
           overflow: "visible",
-          filter: "drop-shadow(0 20px 40px rgba(0,0,0,0.15))"
+          filter: "drop-shadow(0 20px 40px rgba(0,0,0,0.16))"
         }}
       >
         <defs>
-          {/* Skin & Warm Blush Gradients */}
+          {/* Skin & Blush Gradients (Matches Ankit warm stylized palette) */}
           <linearGradient id="eshaniSkin" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#E8AA79" />
-            <stop offset="60%" stopColor="#DC9965" />
-            <stop offset="100%" stopColor="#C6814E" />
+            <stop offset="0%" stopColor="#F9D7BC" />
+            <stop offset="55%" stopColor="#F1C2A0" />
+            <stop offset="100%" stopColor="#E0A783" />
           </linearGradient>
-          <linearGradient id="eshaniNeck" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#BA7443" />
-            <stop offset="100%" stopColor="#DC9965" />
+          <linearGradient id="eshaniNeck" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#D4946D" />
+            <stop offset="45%" stopColor="#E9B28D" />
+            <stop offset="100%" stopColor="#F1C2A0" />
           </linearGradient>
-          <radialGradient id="cheekBlush" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#E2654A" stopOpacity="0.4" />
-            <stop offset="100%" stopColor="#E2654A" stopOpacity="0" />
+          <radialGradient id="noseBlush" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#F97046" stopOpacity="0.85" />
+            <stop offset="100%" stopColor="#F97046" stopOpacity="0" />
           </radialGradient>
-          <radialGradient id="sunGlow" cx="50%" cy="40%" r="60%">
-            <stop offset="0%" stopColor="#FFD89C" stopOpacity="0.3" />
-            <stop offset="100%" stopColor="#DC9965" stopOpacity="0" />
+          <radialGradient id="earBlush" cx="40%" cy="50%" r="60%">
+            <stop offset="0%" stopColor="#F48A66" stopOpacity="0.55" />
+            <stop offset="100%" stopColor="#F1C2A0" stopOpacity="0" />
           </radialGradient>
 
-          {/* Voluminous Dark Wavy Hair Gradients */}
+          {/* Hair Gradients (Bold, Clean, Dark Graphic Curls) */}
           <linearGradient id="hairGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#25272F" />
-            <stop offset="50%" stopColor="#1B1C22" />
-            <stop offset="100%" stopColor="#111216" />
+            <stop offset="0%" stopColor="#282A33" />
+            <stop offset="60%" stopColor="#1C1D24" />
+            <stop offset="100%" stopColor="#121318" />
           </linearGradient>
           <linearGradient id="hairHighlight" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#4A4E5C" />
-            <stop offset="100%" stopColor="#22242C" />
-          </linearGradient>
-          <linearGradient id="hairShadow" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#0B0C0E" />
-            <stop offset="100%" stopColor="#18191E" />
+            <stop offset="0%" stopColor="#4A4E5E" />
+            <stop offset="100%" stopColor="#23252E" />
           </linearGradient>
 
-          {/* Eye & Iris Gradients */}
-          <radialGradient id="irisGrad" cx="45%" cy="40%" r="55%">
-            <stop offset="0%" stopColor="#633A19" />
-            <stop offset="65%" stopColor="#3B1F0A" />
-            <stop offset="100%" stopColor="#1E0F05" />
+          {/* Iris Gradient */}
+          <radialGradient id="irisGrad" cx="40%" cy="38%" r="60%">
+            <stop offset="0%" stopColor="#783D1A" />
+            <stop offset="60%" stopColor="#452009" />
+            <stop offset="100%" stopColor="#1F0E04" />
           </radialGradient>
-          <linearGradient id="eyeShadow" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#000000" stopOpacity="0.16" />
-            <stop offset="100%" stopColor="#000000" stopOpacity="0" />
-          </linearGradient>
 
-          {/* Jewelry Gradients */}
+          {/* Jewelry & Kurta Gradients */}
           <linearGradient id="silverGrad" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="#FFFFFF" />
-            <stop offset="35%" stopColor="#DDE1E8" />
-            <stop offset="70%" stopColor="#9BA2B0" />
-            <stop offset="100%" stopColor="#6C7280" />
+            <stop offset="40%" stopColor="#DCE1EA" />
+            <stop offset="100%" stopColor="#8C93A3" />
           </linearGradient>
           <radialGradient id="bindiGrad" cx="35%" cy="35%" r="65%">
             <stop offset="0%" stopColor="#FFE066" />
@@ -312,77 +304,60 @@ export default function InteractiveAvatar({
             <stop offset="100%" stopColor="#B45309" />
           </radialGradient>
 
-          {/* Kurta & Cloth Gradients */}
           <linearGradient id="kurtaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" stopColor="#FFFFFF" />
-            <stop offset="85%" stopColor="#F3F4F6" />
-            <stop offset="100%" stopColor="#E5E7EB" />
+            <stop offset="85%" stopColor="#F2F4F7" />
+            <stop offset="100%" stopColor="#E2E5EB" />
           </linearGradient>
-          <linearGradient id="kurtaShade" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#E2E5EA" />
-            <stop offset="100%" stopColor="#CACFD8" />
+          <linearGradient id="kurtaShadow" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#CBD0DC" />
+            <stop offset="100%" stopColor="#A8B0C0" />
           </linearGradient>
 
-          {/* Refined Clamped Eye Clip Paths */}
-          <clipPath id="leftEyeClip">
-            <path d="M 142 230 C 150 214, 178 214, 186 230 C 178 244, 150 244, 142 230 Z" />
+          {/* Eye ClipPaths for 3/4 Perspective */}
+          <clipPath id="eyeFarClip">
+            <path d="M 132 230 C 138 206, 164 206, 170 230 C 164 246, 138 246, 132 230 Z" />
           </clipPath>
-          <clipPath id="rightEyeClip">
-            <path d="M 234 230 C 242 214, 270 214, 278 230 C 270 244, 242 244, 234 230 Z" />
+          <clipPath id="eyeNearClip">
+            <path d="M 200 206 C 212 174, 252 174, 258 206 C 252 230, 212 230, 200 206 Z" />
           </clipPath>
         </defs>
 
         {/* ===================================================
-            LAYER 1: SOLID BACK HAIR MASS (Zero Background Gaps)
+            LAYER 1: FULL BACK HAIR MASS (Wavy, Luscious Curls)
             =================================================== */}
         <motion.g style={{ x: backHairX }}>
-          {/* Main Full Hair Mass Silhouette */}
+          {/* Main Solid Hair Silhouette */}
           <path
-            d="M 210 55 
-               C 130 55, 60 100, 48 180 
-               C 35 240, 40 310, 52 370 
-               C 62 420, 85 470, 130 500 
-               C 155 515, 180 500, 185 460 
-               L 185 360 
-               L 235 360 
-               L 235 460 
-               C 240 500, 265 515, 290 500 
-               C 335 470, 358 420, 368 370 
-               C 380 310, 385 240, 372 180 
-               C 360 100, 290 55, 210 55 Z"
+            d="M 210 40 
+               C 130 40, 45 90, 38 180 
+               C 30 250, 42 320, 58 380 
+               C 70 430, 95 480, 145 510 
+               C 175 525, 200 500, 205 450 
+               L 205 380 
+               L 275 380 
+               L 275 450 
+               C 280 500, 305 525, 335 510 
+               C 385 480, 410 430, 422 380 
+               C 438 320, 450 250, 442 180 
+               C 435 90, 350 40, 210 40 Z"
             fill="url(#hairGrad)"
           />
 
-          {/* Wavy Outer Curls & Volume Depth */}
+          {/* Organic Wave Rhythms on Outer Hair */}
           <path
-            d="M 65 190 C 45 225, 42 275, 58 315 C 44 345, 52 390, 72 425 C 88 450, 115 465, 140 460"
+            d="M 58 190 C 36 230, 35 285, 52 330 C 38 365, 48 415, 72 455 C 90 480, 120 495, 150 490"
             stroke="url(#hairHighlight)"
-            strokeWidth="7"
+            strokeWidth="8"
             strokeLinecap="round"
             fill="none"
           />
           <path
-            d="M 355 190 C 375 225, 378 275, 362 315 C 376 345, 368 390, 348 425 C 332 450, 305 465, 280 460"
+            d="M 422 190 C 444 230, 445 285, 428 330 C 442 365, 432 415, 408 455 C 390 480, 360 495, 330 490"
             stroke="url(#hairHighlight)"
-            strokeWidth="7"
+            strokeWidth="8"
             strokeLinecap="round"
             fill="none"
-          />
-          <path
-            d="M 85 250 C 68 285, 70 330, 88 365 C 78 395, 92 430, 115 450"
-            stroke="url(#hairShadow)"
-            strokeWidth="10"
-            strokeLinecap="round"
-            fill="none"
-            opacity="0.6"
-          />
-          <path
-            d="M 335 250 C 352 285, 350 330, 332 365 C 342 395, 328 430, 305 450"
-            stroke="url(#hairShadow)"
-            strokeWidth="10"
-            strokeLinecap="round"
-            fill="none"
-            opacity="0.6"
           />
         </motion.g>
 
@@ -390,51 +365,54 @@ export default function InteractiveAvatar({
             LAYER 2: BODY, SHOULDERS & WHITE EMBROIDERED KURTA
             =================================================== */}
         <g id="bodyGroup">
+          {/* Angled Torso & Shoulders */}
           <path
-            d="M 70 520 C 75 425, 145 375, 210 375 C 275 375, 345 425, 350 520 Z"
+            d="M 80 520 C 90 430, 160 380, 230 375 C 300 375, 385 425, 395 520 Z"
             fill="url(#kurtaGrad)"
           />
+          {/* Left/Right Shading */}
           <path
-            d="M 70 520 C 78 435, 130 390, 170 385 C 150 430, 140 475, 135 520 Z"
-            fill="url(#kurtaShade)"
-            opacity="0.35"
+            d="M 80 520 C 90 440, 140 395, 185 390 C 160 440, 150 480, 145 520 Z"
+            fill="url(#kurtaShadow)"
+            opacity="0.25"
           />
           <path
-            d="M 350 520 C 342 435, 290 390, 250 385 C 270 430, 280 475, 285 520 Z"
-            fill="url(#kurtaShade)"
-            opacity="0.35"
+            d="M 395 520 C 385 440, 335 395, 290 390 C 315 440, 325 480, 330 520 Z"
+            fill="url(#kurtaShadow)"
+            opacity="0.25"
           />
 
-          {/* Balanced Neck */}
+          {/* Graceful Angled Neck */}
           <path
-            d="M 180 270 L 180 375 C 190 388, 230 388, 240 375 L 240 270 Z"
+            d="M 195 280 L 195 385 C 205 398, 255 398, 265 385 L 270 270 Z"
             fill="url(#eshaniNeck)"
           />
+          {/* Neck Drop Shadow under Jaw */}
           <path
-            d="M 178 270 C 190 300, 230 300, 242 270 C 235 310, 185 310, 178 270 Z"
-            fill="#9C5A2B"
+            d="M 195 280 C 205 305, 245 305, 270 270 C 255 315, 205 315, 195 280 Z"
+            fill="#B26C45"
             opacity="0.55"
           />
 
-          {/* Kurta V-Neck */}
+          {/* V-Neck Opening */}
           <path
-            d="M 172 375 L 210 455 L 248 375 C 235 388, 185 388, 172 375 Z"
+            d="M 190 380 L 230 460 L 270 380 C 255 395, 205 395, 190 380 Z"
             fill="url(#eshaniSkin)"
           />
 
-          {/* Silver Chain & Pendant */}
+          {/* Silver Chain & Blue Pendant */}
           <path
-            d="M 186 360 Q 210 415 234 360"
+            d="M 205 365 Q 230 420 255 365"
             stroke="url(#silverGrad)"
-            strokeWidth="2.2"
+            strokeWidth="2.4"
             strokeLinecap="round"
             fill="none"
           />
-          <circle cx="210" cy="415" r="4.2" fill="#2563EB" stroke="#FFFFFF" strokeWidth="1.5" />
+          <circle cx="230" cy="420" r="4.2" fill="#2563EB" stroke="#FFFFFF" strokeWidth="1.5" />
 
-          {/* Chikankari Embroidery Borders */}
+          {/* Chikankari Kurta Embroidery */}
           <path
-            d="M 168 370 L 210 460 L 252 370"
+            d="M 186 375 L 230 465 L 274 375"
             stroke="#FFFFFF"
             strokeWidth="5"
             strokeLinecap="round"
@@ -442,25 +420,26 @@ export default function InteractiveAvatar({
             fill="none"
           />
           <path
-            d="M 164 368 L 210 466 L 256 368"
-            stroke="#E5E7EB"
+            d="M 182 373 L 230 471 L 278 373"
+            stroke="#DCE1EA"
             strokeWidth="1.8"
             strokeDasharray="4 3"
             fill="none"
           />
 
           <g stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.9">
-            <path d="M 188 395 Q 176 395 178 388" />
-            <path d="M 195 412 Q 183 412 186 405" />
-            <path d="M 202 430 Q 192 434 194 425" />
-            <path d="M 232 395 Q 244 395 242 388" />
-            <path d="M 225 412 Q 237 412 234 405" />
-            <path d="M 218 430 Q 228 434 226 425" />
+            <path d="M 206 400 Q 194 400 196 392" />
+            <path d="M 214 420 Q 202 420 205 412" />
+            <path d="M 222 438 Q 212 442 214 433" />
+            <path d="M 252 400 Q 264 400 262 392" />
+            <path d="M 244 420 Q 256 420 253 412" />
+            <path d="M 236 438 Q 246 442 244 433" />
           </g>
         </g>
 
         {/* ===================================================
-            LAYER 3: HEAD, EARS, REFINED EYES & FACE
+            LAYER 3: 3/4 ANGLED HEAD, EARS, NOSE & EYES
+            (Exact Ankit / Pixar Style Geometry)
             =================================================== */}
         <motion.g
           id="headGroup"
@@ -469,275 +448,192 @@ export default function InteractiveAvatar({
             rotateX: headRotateX,
             x: headTranslateX,
             y: headTranslateY,
-            transformOrigin: "210px 260px"
+            transformOrigin: "220px 260px"
           }}
         >
-          {/* Head & Skull Fill */}
-          <ellipse cx="210" cy="190" rx="72" ry="85" fill="url(#eshaniSkin)" />
-
-          {/* Stylized Ears */}
-          <g id="ears">
-            <path
-              d="M 142 215 C 128 215, 122 242, 134 258 C 140 266, 146 264, 148 252 Z"
-              fill="url(#eshaniSkin)"
-            />
-            <path
-              d="M 136 226 C 130 228, 128 244, 136 250"
-              stroke="#B87342"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              fill="none"
-            />
-            <path
-              d="M 278 215 C 292 215, 298 242, 286 258 C 280 266, 274 264, 272 252 Z"
-              fill="url(#eshaniSkin)"
-            />
-            <path
-              d="M 284 226 C 290 228, 292 244, 284 250"
-              stroke="#B87342"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              fill="none"
-            />
-          </g>
-
-          {/* Silver Jhumka Drop Earrings */}
-          <g id="earrings">
-            <motion.g
-              style={{
-                rotate: earringLeftRotate,
-                transformOrigin: "134px 258px"
-              }}
-            >
-              <circle cx="134" cy="258" r="3.8" fill="url(#silverGrad)" stroke="#6C7280" strokeWidth="1" />
-              <line x1="134" y1="262" x2="134" y2="267" stroke="#9BA2B0" strokeWidth="1.8" />
-              <path
-                d="M 125 277 C 125 268, 143 268, 143 277 Z"
-                fill="url(#silverGrad)"
-                stroke="#6C7280"
-                strokeWidth="1"
-              />
-              <line x1="124" y1="277" x2="144" y2="277" stroke="#4B5563" strokeWidth="1.8" />
-              <circle cx="126" cy="281" r="1.5" fill="#FFFFFF" stroke="#9BA2B0" strokeWidth="0.6" />
-              <circle cx="130" cy="282" r="1.5" fill="#FFFFFF" stroke="#9BA2B0" strokeWidth="0.6" />
-              <circle cx="134" cy="282.5" r="1.5" fill="#FFFFFF" stroke="#9BA2B0" strokeWidth="0.6" />
-              <circle cx="138" cy="282" r="1.5" fill="#FFFFFF" stroke="#9BA2B0" strokeWidth="0.6" />
-              <circle cx="142" cy="281" r="1.5" fill="#FFFFFF" stroke="#9BA2B0" strokeWidth="0.6" />
-            </motion.g>
-
-            <motion.g
-              style={{
-                rotate: earringRightRotate,
-                transformOrigin: "286px 258px"
-              }}
-            >
-              <circle cx="286" cy="258" r="3.8" fill="url(#silverGrad)" stroke="#6C7280" strokeWidth="1" />
-              <line x1="286" y1="262" x2="286" y2="267" stroke="#9BA2B0" strokeWidth="1.8" />
-              <path
-                d="M 277 277 C 277 268, 295 268, 295 277 Z"
-                fill="url(#silverGrad)"
-                stroke="#6C7280"
-                strokeWidth="1"
-              />
-              <line x1="276" y1="277" x2="296" y2="277" stroke="#4B5563" strokeWidth="1.8" />
-              <circle cx="278" cy="281" r="1.5" fill="#FFFFFF" stroke="#9BA2B0" strokeWidth="0.6" />
-              <circle cx="282" cy="282" r="1.5" fill="#FFFFFF" stroke="#9BA2B0" strokeWidth="0.6" />
-              <circle cx="286" cy="282.5" r="1.5" fill="#FFFFFF" stroke="#9BA2B0" strokeWidth="0.6" />
-              <circle cx="290" cy="282" r="1.5" fill="#FFFFFF" stroke="#9BA2B0" strokeWidth="0.6" />
-              <circle cx="294" cy="281" r="1.5" fill="#FFFFFF" stroke="#9BA2B0" strokeWidth="0.6" />
-            </motion.g>
-          </g>
-
-          {/* Smooth Face Shape */}
+          {/* Stylized Pixar 3/4 Head Shape */}
           <path
-            d="M 142 175 
-               C 142 110, 278 110, 278 175 
-               C 278 232, 248 285, 210 285 
-               C 172 285, 142 232, 142 175 Z"
+            d="M 135 240 
+               C 115 190, 150 110, 230 110 
+               C 300 110, 335 170, 320 240 
+               C 310 280, 275 315, 220 315 
+               C 175 315, 145 285, 135 240 Z"
             fill="url(#eshaniSkin)"
           />
 
-          {/* Glow & Blush */}
-          <ellipse cx="210" cy="165" rx="50" ry="32" fill="url(#sunGlow)" />
-          <ellipse cx="156" cy="248" rx="20" ry="14" fill="url(#cheekBlush)" />
-          <ellipse cx="264" cy="248" rx="20" ry="14" fill="url(#cheekBlush)" />
+          {/* Far Ear (Left profile) */}
+          <path
+            d="M 135 235 C 118 240, 115 270, 130 285 C 138 292, 145 285, 142 270 Z"
+            fill="url(#eshaniSkin)"
+          />
+          <ellipse cx="128" cy="265" rx="8" ry="14" fill="url(#earBlush)" />
+
+          {/* Near Ear (Cute Pixar Ear on Right) */}
+          <g id="nearEar">
+            <path
+              d="M 315 235 C 345 220, 385 240, 388 268 C 390 295, 350 318, 315 295 Z"
+              fill="url(#eshaniSkin)"
+            />
+            <ellipse cx="350" cy="270" rx="20" ry="15" fill="url(#earBlush)" />
+            <path
+              d="M 335 252 C 355 250, 365 265, 352 278"
+              stroke="#D48660"
+              strokeWidth="3.2"
+              strokeLinecap="round"
+              fill="none"
+            />
+          </g>
+
+          {/* Silver Jhumka on Near Ear */}
+          <g id="jhumka">
+            <motion.g
+              style={{
+                rotate: earringRotate,
+                transformOrigin: "348px 292px"
+              }}
+            >
+              <circle cx="348" cy="292" r="4.2" fill="url(#silverGrad)" stroke="#5A6070" strokeWidth="1" />
+              <line x1="348" y1="296" x2="348" y2="304" stroke="#8C93A3" strokeWidth="2.2" />
+              <path
+                d="M 336 318 C 336 304, 360 304, 360 318 Z"
+                fill="url(#silverGrad)"
+                stroke="#5A6070"
+                strokeWidth="1.2"
+              />
+              <line x1="335" y1="318" x2="361" y2="318" stroke="#374151" strokeWidth="2.2" />
+              <circle cx="338" cy="323" r="1.8" fill="#FFFFFF" stroke="#8C93A3" strokeWidth="0.8" />
+              <circle cx="343" cy="324" r="1.8" fill="#FFFFFF" stroke="#8C93A3" strokeWidth="0.8" />
+              <circle cx="348" cy="324.5" r="1.8" fill="#FFFFFF" stroke="#8C93A3" strokeWidth="0.8" />
+              <circle cx="353" cy="324" r="1.8" fill="#FFFFFF" stroke="#8C93A3" strokeWidth="0.8" />
+              <circle cx="358" cy="323" r="1.8" fill="#FFFFFF" stroke="#8C93A3" strokeWidth="0.8" />
+            </motion.g>
+          </g>
+
+          {/* SIGNATURE WARM CREAM EYE-SOCKET CIRCLES */}
+          <ellipse cx="150" cy="232" rx="24" ry="28" fill="#FCF0E2" />
+          <ellipse cx="230" cy="206" rx="30" ry="35" fill="#FCF0E2" />
 
           {/* Golden Bindi */}
-          <circle cx="210" cy="188" r="4.2" fill="url(#bindiGrad)" stroke="#D97706" strokeWidth="0.8" />
-          <circle cx="208.8" cy="186.8" r="1.2" fill="#FEF3C7" opacity="0.9" />
+          <circle cx="188" cy="168" r="4.6" fill="url(#bindiGrad)" stroke="#D97706" strokeWidth="1" />
+          <circle cx="186.8" cy="166.8" r="1.4" fill="#FEF3C7" opacity="0.95" />
 
-          {/* Eyebrows */}
+          {/* Dynamic Arched Eyebrows */}
           <motion.g style={{ y: eyebrowY }}>
             <path
-              d="M 142 205 C 152 195, 174 195, 185 204"
-              stroke="#1C1E24"
-              strokeWidth="4.2"
+              d="M 135 195 C 145 186, 165 186, 174 194"
+              stroke="#181920"
+              strokeWidth="5"
               strokeLinecap="round"
               fill="none"
             />
             <path
-              d="M 235 204 C 246 195, 268 195, 278 205"
-              stroke="#1C1E24"
-              strokeWidth="4.2"
+              d="M 205 168 C 218 156, 252 156, 266 170"
+              stroke="#181920"
+              strokeWidth="6"
               strokeLinecap="round"
               fill="none"
             />
           </motion.g>
 
-          {/* Nose */}
+          {/* Button Nose with Orange Blush & Nostril Dots */}
           <g id="nose">
-            <path
-              d="M 208 198 L 208 240"
-              stroke="#F6C396"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              opacity="0.65"
-            />
-            <path
-              d="M 201 243 C 204 247, 216 247, 219 243"
-              stroke="#B36636"
-              strokeWidth="2.8"
-              strokeLinecap="round"
-              fill="none"
-            />
-            <circle cx="210" cy="239" r="4.5" fill="#E29562" opacity="0.35" />
+            <ellipse cx="185" cy="245" rx="16" ry="12" fill="url(#noseBlush)" />
+            <circle cx="180" cy="246" r="2.2" fill="#8C3A18" />
+            <circle cx="190" cy="247" r="2.2" fill="#8C3A18" />
           </g>
 
-          {/* Mouth */}
+          {/* Sweet Minimalist Mouth */}
           <g id="mouth">
             {isHappy ? (
-              <>
-                <path
-                  d="M 188 260 C 195 276, 225 276, 232 260 Z"
-                  fill="#991B1B"
-                  stroke="#7F1D1D"
-                  strokeWidth="1.8"
-                />
-                <path
-                  d="M 191 261 C 198 268, 222 268, 229 261 Z"
-                  fill="#FFFFFF"
-                />
-                <path
-                  d="M 186 259 C 198 263, 222 263, 234 259"
-                  stroke="#A8432B"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  fill="none"
-                />
-              </>
-            ) : (
-              <>
-                <path
-                  d="M 188 260 C 198 270, 222 270, 232 260"
-                  stroke="#9E3B20"
-                  strokeWidth="3.2"
-                  strokeLinecap="round"
-                  fill="none"
-                />
-                <path
-                  d="M 196 268 C 202 271, 218 271, 224 268"
-                  stroke="#E2785D"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  opacity="0.85"
-                  fill="none"
-                />
-              </>
-            )}
-          </g>
-
-          {/* ===================================================
-              REFINED EYES & CURSOR-TRACKING PUPILS
-              =================================================== */}
-          <g id="eyes">
-            {/* Left Eye */}
-            <g id="leftEyeGroup" ref={leftEyeRef}>
               <path
-                d="M 142 230 C 150 214, 178 214, 186 230 C 178 244, 150 244, 142 230 Z"
-                fill="#FFFFFF"
-              />
-              <path
-                d="M 142 230 C 150 214, 178 214, 186 230 C 178 220, 150 220, 142 230 Z"
-                fill="url(#eyeShadow)"
-              />
-
-              <g clipPath="url(#leftEyeClip)">
-                <g transform={`translate(${leftPupil.x}, ${leftPupil.y})`}>
-                  <circle cx="164" cy="229" r="11.5" fill="url(#irisGrad)" />
-                  <circle cx="164" cy="229" r="11.5" stroke="#180C04" strokeWidth="1.8" fill="none" />
-                  <circle cx="164" cy="229" r="6.5" fill="#0D0703" />
-                  <circle cx="161" cy="225" r="3" fill="#FFFFFF" opacity="0.95" />
-                  <circle cx="167" cy="232" r="1.5" fill="#FFFFFF" opacity="0.75" />
-                </g>
-              </g>
-
-              <path
-                d="M 140 231 C 150 212, 178 212, 188 231"
-                stroke="#16171B"
+                d="M 188 274 C 196 288, 218 288, 226 274"
+                stroke="#9E3015"
                 strokeWidth="3.6"
                 strokeLinecap="round"
                 fill="none"
               />
+            ) : (
               <path
-                d="M 141 230 Q 136 227 135 222"
-                stroke="#16171B"
-                strokeWidth="2.4"
+                d="M 190 276 C 196 281, 210 281, 216 276"
+                stroke="#9E3015"
+                strokeWidth="3.4"
                 strokeLinecap="round"
                 fill="none"
               />
+            )}
+          </g>
 
+          {/* INTERACTIVE TRACKING EYES */}
+          <g id="eyes">
+            {/* --- FAR EYE (LEFT) --- */}
+            <g id="farEye" ref={leftEyeRef}>
+              <path
+                d="M 132 230 C 138 206, 164 206, 170 230 C 164 246, 138 246, 132 230 Z"
+                fill="#FFFFFF"
+              />
+              <g clipPath="url(#eyeFarClip)">
+                <g transform={`translate(${leftPupil.x}, ${leftPupil.y})`}>
+                  <circle cx="151" cy="226" r="14" fill="url(#irisGrad)" />
+                  <circle cx="151" cy="226" r="14" stroke="#160B04" strokeWidth="2" fill="none" />
+                  <circle cx="151" cy="226" r="7.5" fill="#0C0602" />
+                  <circle cx="147" cy="221" r="3.6" fill="#FFFFFF" opacity="0.95" />
+                  <circle cx="155" cy="229" r="1.8" fill="#FFFFFF" opacity="0.8" />
+                </g>
+              </g>
+
+              <path
+                d="M 130 231 C 138 204, 166 204, 174 231"
+                stroke="#14151C"
+                strokeWidth="4.6"
+                strokeLinecap="round"
+                fill="none"
+              />
               {(isBlinking || isWinking) && (
                 <path
-                  d="M 140 231 C 150 245, 178 245, 188 231 C 178 215, 150 215, 140 231 Z"
+                  d="M 130 231 C 138 246, 166 246, 174 231 C 166 210, 138 210, 130 231 Z"
                   fill="url(#eshaniSkin)"
-                  stroke="#16171B"
-                  strokeWidth="2.8"
+                  stroke="#14151C"
+                  strokeWidth="3.4"
                 />
               )}
             </g>
 
-            {/* Right Eye */}
-            <g id="rightEyeGroup" ref={rightEyeRef}>
+            {/* --- NEAR EYE (RIGHT) --- */}
+            <g id="nearEye" ref={rightEyeRef}>
               <path
-                d="M 234 230 C 242 214, 270 214, 278 230 C 270 244, 242 244, 234 230 Z"
+                d="M 200 206 C 212 174, 252 174, 258 206 C 252 230, 212 230, 200 206 Z"
                 fill="#FFFFFF"
               />
-              <path
-                d="M 234 230 C 242 214, 270 214, 278 230 C 270 220, 242 220, 234 230 Z"
-                fill="url(#eyeShadow)"
-              />
-
-              <g clipPath="url(#rightEyeClip)">
+              <g clipPath="url(#eyeNearClip)">
                 <g transform={`translate(${rightPupil.x}, ${rightPupil.y})`}>
-                  <circle cx="256" cy="229" r="11.5" fill="url(#irisGrad)" />
-                  <circle cx="256" cy="229" r="11.5" stroke="#180C04" strokeWidth="1.8" fill="none" />
-                  <circle cx="256" cy="229" r="6.5" fill="#0D0703" />
-                  <circle cx="253" cy="225" r="3" fill="#FFFFFF" opacity="0.95" />
-                  <circle cx="259" cy="232" r="1.5" fill="#FFFFFF" opacity="0.75" />
+                  <circle cx="230" cy="202" r="18" fill="url(#irisGrad)" />
+                  <circle cx="230" cy="202" r="18" stroke="#160B04" strokeWidth="2.2" fill="none" />
+                  <circle cx="230" cy="202" r="9.5" fill="#0C0602" />
+                  <circle cx="225" cy="196" r="4.8" fill="#FFFFFF" opacity="0.95" />
+                  <circle cx="235" cy="206" r="2.4" fill="#FFFFFF" opacity="0.8" />
                 </g>
               </g>
 
               <path
-                d="M 232 231 C 242 212, 270 212, 280 231"
-                stroke="#16171B"
-                strokeWidth="3.6"
+                d="M 197 207 C 212 172, 254 172, 264 207"
+                stroke="#14151C"
+                strokeWidth="5.6"
                 strokeLinecap="round"
                 fill="none"
               />
               <path
-                d="M 279 230 Q 284 227 285 222"
-                stroke="#16171B"
-                strokeWidth="2.4"
+                d="M 262 206 Q 272 200 274 192"
+                stroke="#14151C"
+                strokeWidth="3.6"
                 strokeLinecap="round"
                 fill="none"
               />
-
               {(isBlinking && !isWinking) && (
                 <path
-                  d="M 232 231 C 242 245, 270 245, 280 231 C 270 215, 242 215, 232 231 Z"
+                  d="M 197 207 C 212 230, 254 230, 264 207 C 254 180, 212 180, 197 207 Z"
                   fill="url(#eshaniSkin)"
-                  stroke="#16171B"
-                  strokeWidth="2.8"
+                  stroke="#14151C"
+                  strokeWidth="4"
                 />
               )}
             </g>
@@ -745,75 +641,67 @@ export default function InteractiveAvatar({
         </motion.g>
 
         {/* ===================================================
-            LAYER 4: FOREGROUND HAIR (Wavy Curls Framing Face)
+            LAYER 4: FOREGROUND HAIR (Wavy Curls Framing Head)
             =================================================== */}
         <motion.g style={{ x: frontHairX }}>
-          {/* Top Crown */}
+          {/* Top Hair Crown Volume */}
           <path
-            d="M 132 170 
-               C 120 95, 175 65, 210 65 
-               C 245 65, 300 95, 288 170 
-               C 272 135, 245 130, 210 130 
-               C 175 130, 148 135, 132 170 Z"
+            d="M 140 180 
+               C 125 90, 185 55, 240 55 
+               C 310 55, 345 110, 335 200 
+               C 315 145, 275 130, 230 130 
+               C 185 130, 155 145, 140 180 Z"
             fill="url(#hairGrad)"
           />
 
-          {/* Left Wavy Framing Lock */}
+          {/* Left Wavy Side Lock */}
           <path
-            d="M 152 140 
-               C 130 145, 110 180, 118 225 
-               C 110 250, 105 295, 122 335 
-               C 105 290, 112 230, 132 185 
-               C 142 165, 148 150, 152 140 Z"
+            d="M 155 150 
+               C 125 155, 95 195, 105 245 
+               C 95 275, 90 325, 112 375 
+               C 90 320, 100 250, 125 195 
+               C 138 170, 148 158, 155 150 Z"
             fill="url(#hairGrad)"
           />
           <path
-            d="M 120 185 C 104 215, 102 255, 115 295 C 122 315, 132 335, 142 350"
+            d="M 108 205 C 88 238, 86 280, 102 325 C 112 350, 125 375, 140 395"
             stroke="url(#hairHighlight)"
-            strokeWidth="5"
-            strokeLinecap="round"
-            fill="none"
-          />
-
-          {/* Right Wavy Framing Lock */}
-          <path
-            d="M 268 140 
-               C 290 145, 310 180, 302 225 
-               C 310 250, 315 295, 298 335 
-               C 315 290, 308 230, 288 185 
-               C 278 165, 272 150, 268 140 Z"
-            fill="url(#hairGrad)"
-          />
-          <path
-            d="M 300 185 C 316 215, 318 255, 305 295 C 298 315, 288 335, 278 350"
-            stroke="url(#hairHighlight)"
-            strokeWidth="5"
+            strokeWidth="6"
             strokeLinecap="round"
             fill="none"
           />
 
-          {/* Forehead Hairline Curls & Waves */}
+          {/* Right Wavy Side Lock */}
           <path
-            d="M 148 145 C 168 128, 192 128, 204 140"
+            d="M 305 145 
+               C 335 155, 360 200, 350 255 
+               C 362 285, 365 335, 342 385 
+               C 368 330, 355 255, 330 195 
+               C 318 170, 310 155, 305 145 Z"
+            fill="url(#hairGrad)"
+          />
+          <path
+            d="M 342 205 C 362 238, 364 280, 348 325 C 338 350, 325 375, 310 395"
             stroke="url(#hairHighlight)"
-            strokeWidth="3.5"
+            strokeWidth="6"
+            strokeLinecap="round"
+            fill="none"
+          />
+
+          {/* Forehead Parting Waves */}
+          <path
+            d="M 155 150 C 180 132, 210 132, 225 148"
+            stroke="url(#hairHighlight)"
+            strokeWidth="4"
             strokeLinecap="round"
             fill="none"
           />
           <path
-            d="M 216 140 C 228 128, 252 128, 272 145"
+            d="M 235 148 C 250 132, 280 132, 305 150"
             stroke="url(#hairHighlight)"
-            strokeWidth="3.5"
+            strokeWidth="4"
             strokeLinecap="round"
             fill="none"
-          />
-          <path
-            d="M 175 125 C 190 115, 230 115, 245 125"
-            stroke="url(#hairHighlight)"
-            strokeWidth="3"
-            strokeLinecap="round"
-            fill="none"
-            opacity="0.8"
           />
         </motion.g>
       </svg>
