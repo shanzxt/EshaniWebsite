@@ -1,6 +1,5 @@
 import DeviceShowcase from "./components/devices/DeviceShowcase";
 import PhoneFrame from "./components/devices/PhoneFrame";
-import ContactDevice from "./components/devices/ContactDevice";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
