@@ -1,3 +1,7 @@
+import DeviceShowcase from "./components/devices/DeviceShowcase";
+import PhoneFrame from "./components/devices/PhoneFrame";
+import ContactDevice from "./components/devices/ContactDevice";
+
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -846,10 +850,11 @@ export default function App() {
               <Reveal className="stack-item" style={{ "--i": "0" }}>
                 <article className="proj proj-wide" data-testid="project-card-optra">
                   <div className="proj-media" data-cursor="MyoCircle">
-                    <Wipe
-                      src={IMG("myocircle-cover.png")}
-                      alt="MyoCircle mobile app across three phones — an AI-companion health app with a gamified breathe, sleep and grow theme."
-                      testId="project-image-myocircle"
+                    <DeviceShowcase
+                      laptop={{ src: IMG("eyeai-dashboard.png"), alt: "MyoCircle provider dashboard" }}
+                      phone={{ src: IMG("myocircle-cover.png"), alt: "MyoCircle mobile app with Zoe, the AI companion" }}
+                      badge="OPTRAHEALTH · ZOE · "
+                       testId="showcase-optra"
                     />
                   </div>
                   <div className="proj-body">
@@ -883,11 +888,11 @@ export default function App() {
               <Reveal className="stack-item" style={{ "--i": "1" }}>
                 <article className="proj proj-wide" data-testid="project-card-travelogue">
                   <div className="proj-media" data-cursor="Travelogue">
-                    <Wipe
-                      src={IMG("travelogue-cover.png")}
-                      alt="Travelogue trip-planning app shown across four phones — upcoming trips, welcome screen, photo feed and group view."
-                      testId="project-image-travelogue"
-                    />
+                    <div className="ph-trio">
+                      <PhoneFrame src={IMG("travelogue-home.png")} alt="Travelogue home feed" delay={0} />
+                      <PhoneFrame src={IMG("travelogue-trip.png")} alt="Travelogue trip hub" delay={0.8} />
+                      <PhoneFrame src={IMG("travelogue-feed.png")} alt="Travelogue photo feed" delay={1.6} />
+                    </div>
                   </div>
                   <div className="proj-body">
                     <div>

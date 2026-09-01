@@ -4,6 +4,9 @@
    @import inside CSS is render-blocking and delays first paint).
    ========================================================================= */
 
+
+@import "./components/devices/devices.css";   
+
 /* ---------- tokens ---------- */
 :root {
   --bg: #F2EEE7;
