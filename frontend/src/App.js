@@ -32,6 +32,10 @@ import {
 } from "./primitives";
 import "./App.css";
 import AvatarHero from "./components/ui/AvatarHero";
+import MacBookScroll from "./components/devices/MacBookScroll";
+import RotateCard from "./components/devices/RotateCard";
+import Assemble from "./components/devices/Assemble";
+import ContactDevice from "./components/devices/ContactDevice";
 
 /* ========================================================================
    Content
@@ -478,15 +482,12 @@ function CaseStudy({ go }) {
             </p>
           </Reveal>
           <div className="chapter-art">
-            <figure className="cs-shot" data-cursor="Eye AI">
-              <Wipe
+              <MacBookScroll
                 src={IMG("eyeai-cover.png")}
                 alt="Eye AI product site introducing AI-assisted diagnostic technology for clinicians."
-                ratio="485 / 400"
+                caption="Product site — onboarding clinicians to the platform"
                 testId="case-image-cover"
               />
-              <figcaption>Product site — onboarding clinicians to the platform</figcaption>
-            </figure>
           </div>
         </article>
       </div>
@@ -850,11 +851,10 @@ export default function App() {
               <Reveal className="stack-item" style={{ "--i": "0" }}>
                 <article className="proj proj-wide" data-testid="project-card-optra">
                   <div className="proj-media" data-cursor="MyoCircle">
-                    <DeviceShowcase
-                      laptop={{ src: IMG("eyeai-dashboard.png"), alt: "MyoCircle provider dashboard" }}
-                      phone={{ src: IMG("myocircle-cover.png"), alt: "MyoCircle mobile app with Zoe, the AI companion" }}
-                      badge="OPTRAHEALTH · ZOE · "
-                       testId="showcase-optra"
+                    <Wipe
+                      src={IMG("myocircle-cover.png")}
+                      alt="MyoCircle mobile app across three phones — an AI-companion health app with a gamified breathe, sleep and grow theme."
+                      testId="project-image-myocircle"
                     />
                   </div>
                   <div className="proj-body">
@@ -977,10 +977,9 @@ export default function App() {
                 </p>
               </Reveal>
             </div>
-            <Reveal>
-              <div className="impact-grid">
-                {impacts.map(([v, label, ctx]) => (
-                  <div
+            <Assemble className="impact-grid" spread={200} swirl={16}>
+              {impacts.map(([v, label, ctx]) => (
+                <div
                     className="impact-cell"
                     key={`${ctx}-${label}`}
                     data-testid={`impact-${ctx.toLowerCase().replace(/[^a-z]+/g, "-")}-${label.toLowerCase().replace(/[^a-z]+/g, "-")}`}
@@ -989,9 +988,9 @@ export default function App() {
                     <div className="impact-label">{label}</div>
                     <div className="impact-context">{ctx}</div>
                   </div>
-                ))}
-              </div>
-            </Reveal>
+                  ))}
+                  </Assemble>
+                
           </div>
         </section>
 

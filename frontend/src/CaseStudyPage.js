@@ -165,12 +165,13 @@ export default function CaseStudyPage() {
 
             {ch.images && (
               <div className={ch.phone ? "phone-row" : "cs-art"}>
-                {ch.images.map(([src, alt, cap], j) => (
+                {ch.images.map(([src, alt, cap], j) => 
+                 ch.phone ? (
                   /* figcaption now lives inside its own <figure>. Previously it
                      sat next to the Wipe <figure> as a loose sibling in a <div>,
                      which is invalid HTML and lost the caption association. */
                   <figure
-                    className={ch.phone ? "phone cs-shot" : "cs-shot"}
+                    className="phone cs-shot"
                     key={src}
                     data-cursor={study.company.split(" ")[0]}
                   >
@@ -184,6 +185,16 @@ export default function CaseStudyPage() {
                     />
                     <figcaption>{cap}</figcaption>
                   </figure>
+                ) : (
+                  <RotateCard
+                    key={src}
+                    src={IMG(src)}
+                    alt={alt}
+                    caption={cap}
+                    from={j % 2 === 0 ? "left" : "right"}
+                    cursor={study.company.split(" ")[0]}
+                    testId={`case-image-${study.slug}-${j}`}
+                  />
                 ))}
               </div>
             )}

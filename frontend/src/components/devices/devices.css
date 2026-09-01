@@ -438,5 +438,75 @@
   .pager-caret, .chip-soon::before { animation: none; }
 }
 
-.ph-trio { display: flex; justify-content: center; align-items: flex-end; gap: clamp(.5rem, 2vw, 1.4rem); padding: 2rem 0; perspective: 1400px; }
-.ph-trio .ph:nth-child(2) { transform: translateY(-26px); z-index: 2; }
+/* ---------- rotate-in screenshot cards ---------- */
+.rcard {
+  margin: 0;
+  perspective: 1200px;
+  perspective-origin: 50% 50%;
+}
+
+.rcard-inner {
+  position: relative;
+  transform-style: preserve-3d;
+  will-change: transform;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--card);
+  box-shadow: 0 26px 44px -30px rgba(var(--shadow-rgb), .5);
+}
+
+.rcard-inner img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.rcard-shadow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(115deg,
+    transparent 42%, rgba(var(--shadow-rgb), .5));
+  mix-blend-mode: multiply;
+}
+
+.rcard figcaption {
+  margin-top: .85rem;
+  font-family: var(--font-mono);
+  font-size: .68rem;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* a pair of cards fanned side by side, Roblox-brief style */
+.rcard-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(1rem, 3vw, 2.4rem);
+  align-items: start;
+}
+@media (max-width: 760px) {
+  .rcard-pair { grid-template-columns: 1fr; }
+}
+
+/* ---------- assemble ---------- */
+.assemble { position: relative; }
+.assemble-item { will-change: transform, opacity, filter; }
+
+/* When Assemble wraps a grid, keep the grid on the wrapper itself. */
+.assemble.assemble-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: clamp(1rem, 2.5vw, 2rem);
+}
+.assemble.assemble-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(.8rem, 2vw, 1.6rem);
+}
+
+/* seal should never sit on top of body copy */
+.showcase .seal { top: 6px; left: 6px; }
+@media (max-width: 900px) { .showcase .seal { top: 0; left: 0; } }
