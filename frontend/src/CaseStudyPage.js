@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { Link, useParams } from "react-router-dom";
 import { motion, useReducedMotion, useScroll } from "framer-motion";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
+import RotateCard from "./components/devices/RotateCard";
 import Lenis from "lenis";
 import {
   EASE,
