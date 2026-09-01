@@ -1,0 +1,74 @@
+/* ReadMode — skim / full toggle */
+
+.readmode {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 1.6rem;
+  padding: 1.1rem 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  margin: 2.4rem 0 0;
+}
+
+.readmode-note {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.readmode-switch {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.readmode-btn {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.62rem 1.05rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  transition:
+    background var(--dur-fast) var(--ease-state),
+    color var(--dur-fast) var(--ease-state);
+}
+.readmode-btn + .readmode-btn { border-left: 1px solid var(--line); }
+.readmode-btn span {
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  opacity: 0.6;
+  text-transform: none;
+}
+.readmode-btn:hover { color: var(--ink); }
+.readmode-btn[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+/* Skim mode: the one-line takeaway reads as the headline's answer. */
+.cs-skim {
+  font-family: var(--font-serif);
+  font-size: clamp(1.15rem, 2vw, 1.5rem);
+  line-height: 1.5;
+  color: var(--ink);
+  max-width: 46ch;
+  margin: 0.6rem 0 0;
+}
+
+@media (max-width: 560px) {
+  .readmode { flex-direction: column; align-items: flex-start; }
+}

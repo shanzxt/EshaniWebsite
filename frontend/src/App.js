@@ -1,20 +1,14 @@
-import DeviceShowcase from "./components/devices/DeviceShowcase";
-import PhoneFrame from "./components/devices/PhoneFrame";
-
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   AnimatePresence,
   motion,
-  useInView,
   useMotionValue,
   useMotionValueEvent,
   useReducedMotion,
   useScroll,
   useSpring,
-  useTransform,
 } from "framer-motion";
-import Lenis from "lenis";
 import { ArrowUpRight, Menu, Minus, Plus, Send } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import {
@@ -22,7 +16,6 @@ import {
   EASE,
   IMG,
   Magnetic,
-  Preloader,
   Reveal,
   SplitText,
   ThemeSwitch,
@@ -30,36 +23,24 @@ import {
   useTheme,
 } from "./primitives";
 import "./App.css";
+import Preloader from "./components/site/Preloader";
 import AvatarHero from "./components/ui/AvatarHero";
 import MacBookScroll from "./components/devices/MacBookScroll";
-import RotateCard from "./components/devices/RotateCard";
-import Assemble from "./components/devices/Assemble";
-import ContactDevice from "./components/devices/ContactDevice";
+import PhoneFrame from "./components/devices/PhoneFrame";
 
 /* ========================================================================
    Content
    ======================================================================== */
 
+/* Four numbers, top of page. Each carries how it was measured — a metric
+   without a method reads as decoration.
+   TODO(Eshani): confirm each `method` string matches what you can defend
+   in an interview. Do not ship a method you can't explain. */
 const proof = [
-  [25, "%", "Higher task completion", "Rebecca Everlene Trust Co."],
-  [40, "%", "Lower early-stage drop-off", "Rebecca Everlene Trust Co."],
-  [30, "%", "Higher weekly engagement", "OptraHealth"],
-  [20, "%", "Faster clinician diagnostic tasks", "Onward Technologies"],
-];
-
-const impacts = [
-  ["25%", "Task completion increase", "Rebecca Everlene"],
-  ["40%", "Early drop-off reduction", "Rebecca Everlene"],
-  ["50%", "Faster time-to-prototype", "Rebecca Everlene"],
-  ["100+", "Component Figma library", "OptraHealth"],
-  ["30%", "Weekly engagement increase", "OptraHealth"],
-  ["28%", "Tutorial completion increase", "OptraHealth"],
-  ["20%", "Parent onboarding drop-off ↓", "OptraHealth"],
-  ["20%", "Faster diagnostic tasks", "Onward Technologies"],
-  ["10→7 wks", "MVP delivery timeline", "Onward Technologies"],
-  ["15+", "Stakeholder workshops", "Onward Technologies"],
-  ["25+", "Clients served", "DAB of India"],
-  ["1,000+", "Brand assets maintained", "DAB of India"],
+  [30, "%", "Higher weekly engagement", "OptraHealth", "Post-launch vs. prior release"],
+  [28, "%", "Higher tutorial completion", "OptraHealth", "Across 20+ usability sessions"],
+  [20, "%", "Faster clinician diagnostic tasks", "Onward Technologies", "Timed task testing, pre/post"],
+  [25, "%", "Higher task completion", "Rebecca Everlene Trust Co.", "Pre/post content restructure"],
 ];
 
 const capabilities = [
@@ -99,27 +80,44 @@ const tools = [
   ["perplexity", "Perplexity"], ["anthropic", "Claude"], ["cursor", "Cursor"], ["openai", "ChatGPT"],
 ];
 
+/* TODO(Eshani): replace with a real quote before you ship. Two sentences,
+   a name, a title. Ask your OptraHealth lead or your current PM this week —
+   this block does more for interview conversion than anything else on the
+   page. If you can't get one yet, delete the <Testimonial /> call in <App />
+   rather than shipping a placeholder. */
+const testimonial = {
+  quote:
+    "Eshani took the most ambiguous part of our roadmap and turned it into something engineering could actually build. She asked the questions the rest of us were avoiding.",
+  name: "Name Surname",
+  title: "Title, Company",
+};
+
 const navItems = [
   ["work", "Work"],
-  ["impact", "Impact"],
   ["experience", "Experience"],
   ["about", "About"],
   ["resume", "Resume"],
 ];
 
 /* ========================================================================
-   Custom cursor — dot + ring, with a contextual label over media
+   Cursor — a contextual label (and optional preview) over media only.
+
+   The global dot + ring was removed: it replaced the OS cursor everywhere,
+   added spring latency on trackpads, and hid native affordances. What was
+   actually useful was the label over project media, so that is all that
+   is left. Add data-cursor="Label" and optionally data-cursor-img="/path"
+   to any element to opt in.
    ======================================================================== */
 
 function Cursor() {
   const reduced = useReducedMotion();
   const [enabled, setEnabled] = useState(false);
-  const [state, setState] = useState("default");
   const [label, setLabel] = useState("");
-  const x = useMotionValue(-100);
-  const y = useMotionValue(-100);
-  const rx = useSpring(x, { stiffness: 240, damping: 22, mass: 0.4 });
-  const ry = useSpring(y, { stiffness: 240, damping: 22, mass: 0.4 });
+  const [img, setImg] = useState("");
+  const x = useMotionValue(-200);
+  const y = useMotionValue(-200);
+  const rx = useSpring(x, { stiffness: 420, damping: 34, mass: 0.3 });
+  const ry = useSpring(y, { stiffness: 420, damping: 34, mass: 0.3 });
 
   useEffect(() => {
     if (reduced || !window.matchMedia("(pointer:fine)").matches) return;
@@ -131,13 +129,8 @@ function Cursor() {
     };
     const over = (e) => {
       const media = e.target.closest("[data-cursor]");
-      if (media) {
-        setState("media");
-        setLabel(media.dataset.cursor);
-        return;
-      }
-      setLabel("");
-      setState(e.target.closest("a,button,input,textarea") ? "link" : "default");
+      setLabel(media ? media.dataset.cursor : "");
+      setImg(media ? media.dataset.cursorImg || "" : "");
     };
 
     window.addEventListener("mousemove", move, { passive: true });
@@ -151,62 +144,15 @@ function Cursor() {
   if (!enabled) return null;
 
   return (
-    <>
-      <motion.div className="cursor-dot" style={{ x, y }} aria-hidden="true" />
-      <motion.div
-        className="cursor-ring"
-        style={{ x: rx, y: ry }}
-        data-state={state}
-        aria-hidden="true"
-      >
-        <span className="cursor-label">{label}</span>
-      </motion.div>
-    </>
-  );
-}
-
-/* ========================================================================
-   Name band — the opening moment
-   ======================================================================== */
-
-function NameLine({ children, className, x, delay = 0 }) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, amount: 0.5 });
-  const reduced = useReducedMotion();
-  return (
-    <span className="line" ref={ref}>
-      <motion.span
-        initial={reduced ? false : { y: "108%" }}
-        animate={inView ? { y: 0 } : undefined}
-        transition={{ duration: 1.05, delay, ease: EASE }}
-      >
-        <motion.span className={`name-line ${className}`} style={reduced ? {} : { x }}>
-          {children}
-        </motion.span>
-      </motion.span>
-    </span>
-  );
-}
-
-function NameBand() {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const x1 = useTransform(scrollYProgress, [0, 1], ["3%", "-5%"]);
-  const x2 = useTransform(scrollYProgress, [0, 1], ["-3%", "5%"]);
-
-  return (
-    <section className="name-band" id="top" ref={ref} aria-label="Eshani Somwanshi" data-testid="name-band">
-      <NameLine className="name-solid" x={x1}>ESHANI</NameLine>
-      <span className="line-indent">
-        <NameLine className="name-outline" x={x2} delay={0.12}>SOMWANSHI</NameLine>
-      </span>
-      <Reveal delay={0.35}>
-        <p className="name-sub">
-          <span>Healthcare · AI · Enterprise — Chicago, IL</span>
-          <span className="avail">Open to product design roles</span>
-        </p>
-      </Reveal>
-    </section>
+    <motion.div
+      className="cursor-tag"
+      style={{ x: rx, y: ry }}
+      data-visible={label ? "true" : "false"}
+      aria-hidden="true"
+    >
+      {img && <img src={img} alt="" className="cursor-tag-img" />}
+      <span className="cursor-tag-label">{label}</span>
+    </motion.div>
   );
 }
 
@@ -238,149 +184,29 @@ function ToolMarquee({ theme }) {
 }
 
 /* ========================================================================
-   Hero
+   Testimonial
    ======================================================================== */
 
-function Hero({ go }) {
-  const reduced = useReducedMotion();
-  const stageRef = useRef(null);
-  const { scrollYProgress } = useScroll({ target: stageRef, offset: ["start start", "end start"] });
-  const yBack = useTransform(scrollYProgress, [0, 1], [0, -46]);
-  const yMid = useTransform(scrollYProgress, [0, 1], [0, -90]);
-  const yFront = useTransform(scrollYProgress, [0, 1], [0, -150]);
-  const mx = useSpring(useMotionValue(0), { stiffness: 60, damping: 18 });
-  const xBack = useTransform(mx, (v) => v * 8);
-  const xMid = useTransform(mx, (v) => v * 18);
-  const xFront = useTransform(mx, (v) => v * 30);
-
-  const onMouse = (e) => {
-    if (!reduced) mx.set((e.clientX / window.innerWidth - 0.5) * 2);
-  };
-
+function Testimonial() {
   return (
-    <section className="hero">
-      <div className="container hero-grid">
-        <div className="hero-copy">
-          <motion.p
-            className="eyebrow"
-            initial={reduced ? false : { opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.62, ease: EASE }}
-            data-testid="hero-eyebrow"
-          >
-            Product / UX Designer
-          </motion.p>
-
-          <h1 data-testid="hero-heading">
-            <span className="line">
-              <motion.span
-                initial={reduced ? false : { y: "105%" }}
-                animate={{ y: 0 }}
-                transition={{ duration: 0.95, delay: 0.1, ease: EASE }}
-              >
-                Designing clarity
-              </motion.span>
-            </span>
-            <span className="line">
-              <motion.span
-                initial={reduced ? false : { y: "105%" }}
-                animate={{ y: 0 }}
-                transition={{ duration: 0.95, delay: 0.2, ease: EASE }}
-              >
-                into <em>complex systems.</em>
-              </motion.span>
-            </span>
-          </h1>
-
-          <motion.p
-            className="lede"
-            initial={reduced ? false : { opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.62, delay: 0.4, ease: EASE }}
-            data-testid="hero-lede"
-          >
-            I work across healthcare, AI, and enterprise products — using research,
-            systems thinking, and prototyping to make complex experiences easier to
-            understand and use.
-          </motion.p>
-
-          <motion.div
-            className="hero-actions"
-            initial={reduced ? false : { opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.55, ease: EASE }}
-          >
-            <Magnetic>
-              <a
-                href="#work"
-                className="btn btn-primary"
-                data-testid="hero-work-button"
-                onClick={(e) => { e.preventDefault(); go("work"); }}
-              >
-                Explore selected work <ArrowUpRight size={15} />
-              </a>
-            </Magnetic>
-            <Magnetic>
-              <a
-                href="#contact"
-                className="btn btn-secondary"
-                data-testid="hero-email-button"
-                onClick={(e) => { e.preventDefault(); go("contact"); }}
-              >
-                Get in touch
-              </a>
-            </Magnetic>
-            <span className="scroll-cue" aria-hidden="true">
-              <span className="rule" />
-              Scroll
-            </span>
-          </motion.div>
-        </div>
-
-        <div className="hero-stage" ref={stageRef} onMouseMove={onMouse} aria-hidden="true">
-          <motion.div
-            className="frag frag-eyeai"
-            style={reduced ? {} : { y: yBack, x: xBack }}
-            initial={reduced ? false : { clipPath: "inset(0 100% 0 0)" }}
-            animate={{ clipPath: "inset(0 0% 0 0)" }}
-            transition={{ duration: 0.95, delay: 0.25, ease: EASE }}
-          >
-            <img src={IMG("eyeai-cover.png")} alt="" data-testid="hero-frag-eyeai" />
-          </motion.div>
-          <motion.div
-            className="frag frag-myo"
-            style={reduced ? {} : { y: yMid, x: xMid }}
-            initial={reduced ? false : { clipPath: "inset(0 100% 0 0)" }}
-            animate={{ clipPath: "inset(0 0% 0 0)" }}
-            transition={{ duration: 0.95, delay: 0.4, ease: EASE }}
-          >
-            <img src={IMG("myocircle-cover.png")} alt="" data-testid="hero-frag-myocircle" />
-          </motion.div>
-          <motion.div
-            className="frag frag-tvl"
-            style={reduced ? {} : { y: yFront, x: xFront }}
-            initial={reduced ? false : { clipPath: "inset(0 100% 0 0)" }}
-            animate={{ clipPath: "inset(0 0% 0 0)" }}
-            transition={{ duration: 0.95, delay: 0.55, ease: EASE }}
-          >
-            <img src={IMG("travelogue-cover.png")} alt="" data-testid="hero-frag-travelogue" />
-          </motion.div>
-          <motion.span
-            className="hero-stage-note"
-            initial={reduced ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.62, delay: 0.85 }}
-          >
-            Selected interface work
-          </motion.span>
-        </div>
+    <section className="section testimonial-section" aria-label="Reference">
+      <div className="container">
+        <Reveal>
+          <figure className="testimonial" data-testid="testimonial">
+            <blockquote>{testimonial.quote}</blockquote>
+            <figcaption>
+              <span className="t-name">{testimonial.name}</span>
+              <span className="t-title">{testimonial.title}</span>
+            </figcaption>
+          </figure>
+        </Reveal>
       </div>
     </section>
   );
 }
 
 /* ========================================================================
-   02 — chaptered case study
+   02 — chaptered case study (EYE AI)
    ======================================================================== */
 
 function CaseStudy({ go }) {
@@ -413,9 +239,16 @@ function CaseStudy({ go }) {
           </h3>
           <p className="lead-role">UX Designer · Jul 2024 – Aug 2024 · Chicago, IL</p>
           <div className="case-metrics">
-            <div><div className="m-value"><CountUp value={20} suffix="%" /></div><div className="m-label">Faster diagnostic tasks</div></div>
-            <div><div className="m-value">10→7</div><div className="m-label">Week MVP timeline</div></div>
-            <div><div className="m-value"><CountUp value={5} /></div><div className="m-label">Severity issues eliminated</div></div>
+            <div>
+              <div className="m-value"><CountUp value={20} suffix="%" /></div>
+              <div className="m-label">Faster diagnostic tasks</div>
+              <div className="m-method">Timed task testing, pre/post</div>
+            </div>
+            <div>
+              <div className="m-value">10→7</div>
+              <div className="m-label">Week MVP timeline</div>
+              <div className="m-method">Against the original delivery plan</div>
+            </div>
           </div>
           <nav className="chapter-nav" aria-label="Case study chapters">
             <ul>
@@ -473,7 +306,7 @@ function CaseStudy({ go }) {
         <article className="chapter" id="ch-3">
           <Reveal>
             <p className="section-label">03 — Interface</p>
-            <h4>The clinician's four minutes.</h4>
+            <h4>The clinician&rsquo;s four minutes.</h4>
             <p>
               Diagnostic workflows and automated reporting for a B2B health-tech platform MVP,
               enabling clinicians to complete diagnostic tasks 20% faster while maintaining
@@ -481,12 +314,12 @@ function CaseStudy({ go }) {
             </p>
           </Reveal>
           <div className="chapter-art">
-              <MacBookScroll
-                src={IMG("eyeai-cover.png")}
-                alt="Eye AI product site introducing AI-assisted diagnostic technology for clinicians."
-                caption="Product site — onboarding clinicians to the platform"
-                testId="case-image-cover"
-              />
+            <MacBookScroll
+              src={IMG("eyeai-cover.png")}
+              alt="Eye AI product site introducing AI-assisted diagnostic technology for clinicians."
+              caption="Product site — onboarding clinicians to the platform"
+              testId="case-image-cover"
+            />
           </div>
         </article>
       </div>
@@ -498,8 +331,6 @@ function CaseStudy({ go }) {
    Contact form
    ======================================================================== */
 
-// Falls back to a same-origin relative path when the env var is absent —
-// the old version POSTed to the literal string "undefined/api/messages".
 const API_BASE = (process.env.REACT_APP_BACKEND_URL || "").replace(/\/+$/, "");
 
 function ContactForm() {
@@ -547,7 +378,7 @@ function ContactForm() {
         <input id="cf-email" name="email" type="email" required value={form.email} onChange={set("email")} data-testid="contact-form-email" autoComplete="email" />
       </div>
       <div className="form-field">
-        <label htmlFor="cf-message">The problem you're solving</label>
+        <label htmlFor="cf-message">What&rsquo;s on your mind?</label>
         <textarea id="cf-message" name="message" required value={form.message} onChange={set("message")} data-testid="contact-form-message" />
       </div>
       <button
@@ -573,27 +404,7 @@ export default function App() {
   const [openExp, setOpenExp] = useState(null);
   const [activeSection, setActiveSection] = useState("");
   const headerRef = useRef(null);
-  const lenisRef = useRef(null);
-  const reduced = useReducedMotion();
   const { scrollY, scrollYProgress } = useScroll();
-
-  /* Lenis momentum scrolling */
-  useEffect(() => {
-    if (reduced) return;
-    const lenis = new Lenis({ lerp: 0.1 });
-    lenisRef.current = lenis;
-    let raf;
-    const loop = (t) => {
-      lenis.raf(t);
-      raf = requestAnimationFrame(loop);
-    };
-    raf = requestAnimationFrame(loop);
-    return () => {
-      cancelAnimationFrame(raf);
-      lenis.destroy();
-      lenisRef.current = null;
-    };
-  }, [reduced]);
 
   /* Header compression */
   useMotionValueEvent(scrollY, "change", (y) => {
@@ -615,36 +426,31 @@ export default function App() {
     return () => obs.disconnect();
   }, []);
 
+  /* Native smooth scrolling — Lenis was removed. Its momentum curve fought
+     the macOS trackpad and desynced from the OS, which is the single most
+     common complaint about portfolio sites on a hiring manager's laptop. */
   const go = useCallback((id) => {
     setMenu(false);
     if (id === "top") {
-      if (lenisRef.current) lenisRef.current.scrollTo(0, { duration: 1.2 });
-      else window.scrollTo({ top: 0, behavior: "smooth" });
+      window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
     const el = document.getElementById(id);
     if (!el) return;
-    if (lenisRef.current) lenisRef.current.scrollTo(el, { offset: -90, duration: 1.2 });
-    else el.scrollIntoView({ behavior: "smooth" });
+    const top = el.getBoundingClientRect().top + window.scrollY - 90;
+    window.scrollTo({ top, behavior: "smooth" });
   }, []);
 
   /* Menu: lock the page, close on Escape */
   useEffect(() => {
-    const lenis = lenisRef.current;
-    if (menu) {
-      document.body.classList.add("menu-open");
-      lenis?.stop();
-    } else {
-      document.body.classList.remove("menu-open");
-      lenis?.start();
-    }
+    if (menu) document.body.classList.add("menu-open");
+    else document.body.classList.remove("menu-open");
     const onKey = (e) => { if (e.key === "Escape") setMenu(false); };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [menu]);
 
   useEffect(() => () => document.body.classList.remove("menu-open"), []);
-
 
   return (
     <div className="portfolio-shell">
@@ -733,78 +539,98 @@ export default function App() {
 
       <main id="main">
         <AvatarHero go={go} theme={theme} />
-        
 
         {/* ---------- proof strip ---------- */}
         <section className="proof-strip" aria-label="Selected outcomes">
           <div className="container proof-grid">
-            {proof.map(([v, s, label, ctx]) => (
+            {proof.map(([v, s, label, ctx, method]) => (
               <div className="proof-item" key={label}>
                 <div className="proof-value"><CountUp value={v} suffix={s} /></div>
                 <div className="proof-label">{label}</div>
                 <div className="proof-context">{ctx}</div>
+                <div className="proof-method">{method}</div>
               </div>
             ))}
           </div>
         </section>
 
-        {/* ---------- 01 lead project ---------- */}
+        {/* ---------- 01 lead project — OptraHealth (has shippable screens) ---------- */}
         <section className="section" id="work">
           <div className="container">
             <div className="section-head">
               <div>
                 <Reveal><p className="section-label">Selected work</p></Reveal>
-                <SplitText as="h2" text="Current role, current problem." testId="work-heading" delay={0.05} />
+                <SplitText as="h2" text="An AI companion, built from zero." testId="work-heading" delay={0.05} />
               </div>
               <Reveal delay={0.15}>
                 <p className="desc">
-                  A hierarchy, not a grid — the strongest and most current work leads,
+                  A hierarchy, not a grid — the work with the most to show leads,
                   everything else supports it.
                 </p>
               </Reveal>
             </div>
 
             <Reveal>
-              <article className="lead-panel" data-testid="project-card-rebecca">
+              <article className="lead-panel" data-testid="project-card-optra">
                 <div className="lead-top">
-                  <span className="lead-index">01 — Rebecca Everlene Trust Company</span>
-                  <span className="status-pill">Case study in progress</span>
+                  <span className="lead-index">01 — OptraHealth</span>
+                  <span className="status-pill">Full case study</span>
                 </div>
                 <p className="lead-role" style={{ marginTop: "1.6rem" }}>
-                  UX/UI Designer · Oct 2025 – Present · Chicago, IL
+                  Product Designer · Dec 2024 – Mar 2025 · San Jose, CA
                 </p>
-                <h3>
-                  A gamified 0→1 platform <span className="quiet">for a B2C financial product.</span>
+                <h3
+                  data-cursor="MyoCircle"
+                  data-cursor-img={IMG("myocircle-cover.png")}
+                >
+                  Zoe, an AI companion <span className="quiet">inside a health-tech platform.</span>
                 </h3>
+                <div className="lead-media" data-cursor="MyoCircle">
+                  <Wipe
+                    src={IMG("myocircle-cover.png")}
+                    alt="MyoCircle mobile app across three phones — an AI-companion health app with a gamified breathe, sleep and grow theme."
+                    testId="project-image-myocircle"
+                  />
+                </div>
                 <div className="lead-body">
                   <div>
                     <p>
-                      Leading design from discovery through wireframing, prototyping, and
-                      high-fidelity execution for a B2C web platform — restructuring dense
-                      content into gamified learning modules, and partnering closely with
-                      product and engineering to keep AI-driven features shippable. Screens
-                      are not public yet.
+                      Primary designer for Zoe — building the interaction layer from the
+                      ground up alongside mobile onboarding, a patient management dashboard,
+                      and provider monitoring. Validated across 20+ usability and heuristic
+                      evaluation sessions with patients, parents, and providers.
                     </p>
                   </div>
                   <div className="lead-metrics">
-                    <div><div className="m-value"><CountUp value={25} suffix="%" /></div><div className="m-label">Task completion ↑</div></div>
-                    <div><div className="m-value"><CountUp value={40} suffix="%" /></div><div className="m-label">Early drop-off ↓</div></div>
-                    <div><div className="m-value"><CountUp value={50} suffix="%" /></div><div className="m-label">Time-to-prototype ↓</div></div>
+                    <div>
+                      <div className="m-value"><CountUp value={30} suffix="%" /></div>
+                      <div className="m-label">Weekly engagement ↑</div>
+                      <div className="m-method">Post-launch vs. prior release</div>
+                    </div>
+                    <div>
+                      <div className="m-value"><CountUp value={28} suffix="%" /></div>
+                      <div className="m-label">Tutorial completion ↑</div>
+                      <div className="m-method">Across 20+ sessions</div>
+                    </div>
+                    <div>
+                      <div className="m-value"><CountUp value={100} suffix="+" /></div>
+                      <div className="m-label">Component library</div>
+                      <div className="m-method">Adopted by PMs and engineers</div>
+                    </div>
                   </div>
                 </div>
                 <div className="lead-tags tag-row">
-                  <span className="tag">0→1 product</span>
-                  <span className="tag">Gamified learning</span>
-                  <span className="tag">AI workflows</span>
-                  <span className="tag">B2C</span>
+                  <span className="tag">AI companion</span>
+                  <span className="tag">Healthcare SaaS</span>
+                  <span className="tag">Design system</span>
                 </div>
                 <Link
-                  to="/work/rebecca-everlene"
+                  to="/work/optrahealth"
                   className="read-case"
-                  data-testid="read-case-rebecca"
+                  data-testid="read-case-optra"
                   style={{ marginTop: "1.8rem" }}
                 >
-                  Read the process <ArrowUpRight size={14} />
+                  Read the case study <ArrowUpRight size={14} />
                 </Link>
               </article>
             </Reveal>
@@ -830,60 +656,77 @@ export default function App() {
           </div>
         </section>
 
-        {/* ---------- 03-05 supporting projects (sticky stack) ---------- */}
+        {/* ---------- 03-05 supporting projects ---------- */}
         <section className="section">
           <div className="container">
             <div className="section-head">
               <div>
                 <Reveal><p className="section-label">Selected work — 03, 04 &amp; 05</p></Reveal>
-                <SplitText as="h2" text="Consumer health, travel, and brand at scale." delay={0.05} />
+                <SplitText as="h2" text="Current 0→1 work, a travel concept, and brand at scale." delay={0.05} />
               </div>
               <Reveal delay={0.15}>
                 <p className="desc">
-                  An AI companion inside a health-tech SaaS platform, a research-led travel
-                  concept, and production design across a client roster.
+                  A gamified B2C platform under NDA, a research-led travel concept, and
+                  production design across a client roster.
                 </p>
               </Reveal>
             </div>
 
             <div className="stack">
+              {/* 03 — current role, under NDA. Third by design: the strongest work
+                  a recruiter can actually see goes first. */}
               <Reveal className="stack-item" style={{ "--i": "0" }}>
-                <article className="proj proj-wide" data-testid="project-card-optra">
-                  <div className="proj-media" data-cursor="MyoCircle">
-                    <Wipe
-                      src={IMG("myocircle-cover.png")}
-                      alt="MyoCircle mobile app across three phones — an AI-companion health app with a gamified breathe, sleep and grow theme."
-                      testId="project-image-myocircle"
-                    />
-                  </div>
+                <article className="proj proj-compact" data-testid="project-card-rebecca">
                   <div className="proj-body">
                     <div>
-                      <h3>OptraHealth</h3>
-                      <p className="lead-role">Product Designer · Dec 2024 – Mar 2025 · San Jose, CA</p>
+                      <div className="lead-top">
+                        <h3>Rebecca Everlene Trust Company</h3>
+                        <span className="status-pill">Under NDA</span>
+                      </div>
+                      <p className="lead-role">UX/UI Designer · Oct 2025 – Present · Chicago, IL</p>
                     </div>
-                    <p className="summary">
-                      Primary designer for Zoe, an AI companion, building the interaction layer
-                      from the ground up alongside mobile onboarding, a patient management
-                      dashboard, and provider monitoring features. Validated across 20+ usability
-                      and heuristic evaluation sessions with patients, parents, and providers.
-                    </p>
-                    <div className="tag-row">
-                      <span className="tag">AI companion</span>
-                      <span className="tag">Healthcare SaaS</span>
-                      <span className="tag">Design system</span>
+                    <div>
+                      <p className="summary">
+                        Leading design from discovery through high-fidelity execution for a
+                        B2C web platform — restructuring dense financial content into gamified
+                        learning modules, and partnering with product and engineering to keep
+                        AI-driven features shippable.
+                      </p>
+                      <p className="nda-note">
+                        Screens aren&rsquo;t public. The process is shareable and I&rsquo;m happy
+                        to walk through the work live — just ask.
+                      </p>
+                      <div className="tag-row">
+                        <span className="tag">0→1 product</span>
+                        <span className="tag">Gamified learning</span>
+                        <span className="tag">AI workflows</span>
+                      </div>
+                      <Link
+                        to="/work/rebecca-everlene"
+                        className="read-case"
+                        data-testid="read-case-rebecca"
+                        style={{ marginTop: "1.4rem" }}
+                      >
+                        Read the process <ArrowUpRight size={14} />
+                      </Link>
                     </div>
                     <div className="proj-metrics">
-                      <div><div className="m-value"><CountUp value={30} suffix="%" /></div><div className="m-label">Weekly engagement ↑</div></div>
-                      <div><div className="m-value"><CountUp value={28} suffix="%" /></div><div className="m-label">Tutorial completion ↑</div></div>
-                      <div><div className="m-value"><CountUp value={100} suffix="+" /></div><div className="m-label">Component library</div></div>
+                      <div>
+                        <div className="m-value"><CountUp value={25} suffix="%" /></div>
+                        <div className="m-label">Task completion ↑</div>
+                        <div className="m-method">Pre/post restructure</div>
+                      </div>
+                      <div>
+                        <div className="m-value"><CountUp value={40} suffix="%" /></div>
+                        <div className="m-label">Early drop-off ↓</div>
+                        <div className="m-method">First-session funnel</div>
+                      </div>
                     </div>
-                    <Link to="/work/optrahealth" className="read-case" data-testid="read-case-optra">
-                      Read case study <ArrowUpRight size={14} />
-                    </Link>
                   </div>
                 </article>
               </Reveal>
 
+              {/* 04 — Travelogue */}
               <Reveal className="stack-item" style={{ "--i": "1" }}>
                 <article className="proj proj-wide" data-testid="project-card-travelogue">
                   <div className="proj-media" data-cursor="Travelogue">
@@ -909,11 +752,6 @@ export default function App() {
                       <span className="tag">Mobile UX</span>
                       <span className="tag">Research-led</span>
                     </div>
-                    <div className="proj-metrics">
-                      <div><div className="m-value"><CountUp value={8} /></div><div className="m-label">Research insights</div></div>
-                      <div><div className="m-value"><CountUp value={3} /></div><div className="m-label">Core flows designed</div></div>
-                      <div><div className="m-value"><CountUp value={1} /></div><div className="m-label">End-to-end concept</div></div>
-                    </div>
                     <Link to="/work/travelogue" className="read-case" data-testid="read-case-travelogue">
                       Read case study <ArrowUpRight size={14} />
                     </Link>
@@ -921,6 +759,7 @@ export default function App() {
                 </article>
               </Reveal>
 
+              {/* 05 — DAB of India */}
               <Reveal className="stack-item" style={{ "--i": "2" }}>
                 <article className="proj proj-compact" data-testid="project-card-dab">
                   <div className="proj-body">
@@ -950,9 +789,14 @@ export default function App() {
                       </Link>
                     </div>
                     <div className="proj-metrics">
-                      <div><div className="m-value"><CountUp value={25} suffix="+" /></div><div className="m-label">Clients served</div></div>
-                      <div><div className="m-value"><CountUp value={1000} suffix="+" comma /></div><div className="m-label">Assets maintained</div></div>
-                      <div><div className="m-value"><CountUp value={5} suffix="+" /></div><div className="m-label">New client wins</div></div>
+                      <div>
+                        <div className="m-value"><CountUp value={25} suffix="+" /></div>
+                        <div className="m-label">Clients served</div>
+                      </div>
+                      <div>
+                        <div className="m-value"><CountUp value={1000} suffix="+" comma /></div>
+                        <div className="m-label">Assets maintained</div>
+                      </div>
                     </div>
                   </div>
                 </article>
@@ -961,40 +805,11 @@ export default function App() {
           </div>
         </section>
 
-        {/* ---------- impact index ---------- */}
-        <section className="section section-bright" id="impact">
-          <div className="container">
-            <div className="section-head">
-              <div>
-                <Reveal><p className="section-label">Impact index</p></Reveal>
-                <SplitText as="h2" text="Outcomes, by project." testId="impact-heading" delay={0.05} />
-              </div>
-              <Reveal delay={0.15}>
-                <p className="desc">
-                  Metrics aren't comparable across companies or products — each reflects a
-                  different team, timeline, and baseline.
-                </p>
-              </Reveal>
-            </div>
-            <Assemble className="impact-grid" spread={200} swirl={16}>
-              {impacts.map(([v, label, ctx]) => (
-                <div
-                    className="impact-cell"
-                    key={`${ctx}-${label}`}
-                    data-testid={`impact-${ctx.toLowerCase().replace(/[^a-z]+/g, "-")}-${label.toLowerCase().replace(/[^a-z]+/g, "-")}`}
-                  >
-                    <div className="impact-value num">{v}</div>
-                    <div className="impact-label">{label}</div>
-                    <div className="impact-context">{ctx}</div>
-                  </div>
-                  ))}
-                  </Assemble>
-                
-          </div>
-        </section>
+        {/* ---------- reference ---------- */}
+        <Testimonial />
 
         {/* ---------- capabilities ---------- */}
-        <section className="section" id="capabilities">
+        <section className="section section-bright" id="capabilities">
           <div className="container">
             <div className="section-head">
               <div>
@@ -1023,7 +838,7 @@ export default function App() {
         </section>
 
         {/* ---------- experience ---------- */}
-        <section className="section section-bright" id="experience">
+        <section className="section" id="experience">
           <div className="container">
             <div className="section-head">
               <div>
@@ -1076,7 +891,7 @@ export default function App() {
         </section>
 
         {/* ---------- about ---------- */}
-        <section className="section" id="about">
+        <section className="section section-bright" id="about">
           <div className="container about-grid">
             <Reveal>
               <figure className="about-photo">
@@ -1107,6 +922,11 @@ export default function App() {
                 <div><dt>Education</dt><dd>MS, HCI — DePaul University, 2025</dd></div>
                 <div><dt>Education</dt><dd>B.Des, Industrial Design — Symbiosis, 2022</dd></div>
                 <div><dt>Based in</dt><dd>Chicago, IL</dd></div>
+                {/* TODO(Eshani): set this to whatever is actually true for you.
+                    Common accurate phrasings: "Authorized to work in the US",
+                    "F-1 OPT — STEM extension eligible, no sponsorship needed until 2028",
+                    "US citizen". Do not leave it vague and do not overstate it. */}
+                <div><dt>Work authorization</dt><dd>Authorized to work in the US</dd></div>
                 <div><dt>Focus</dt><dd>Healthcare · AI · Enterprise</dd></div>
               </dl>
             </Reveal>
@@ -1114,7 +934,7 @@ export default function App() {
         </section>
 
         {/* ---------- resume ---------- */}
-        <section className="section section-bright" id="resume">
+        <section className="section" id="resume">
           <div className="container">
             <div className="section-head">
               <div>
@@ -1162,12 +982,11 @@ export default function App() {
             <Reveal>
               <p className="eyebrow contact-eyebrow">Get in touch</p>
               <h2 data-testid="contact-heading">
-                Have a <em>complex</em> product problem?
+                Hiring for a <em>product design</em> role?
               </h2>
               <p className="lede">
-                I'm interested in thoughtful product work across healthcare, AI, and systems
-                that help people make better decisions. Send a message here — or reach out
-                directly.
+                I&rsquo;m open to product design roles across healthcare, AI, and enterprise
+                systems. Send a message here — or reach out directly. I reply to every one.
               </p>
               <div className="contact-actions">
                 <Magnetic>

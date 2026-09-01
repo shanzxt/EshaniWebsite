@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   animate,
   motion,
@@ -256,79 +256,4 @@ export function ThemeSwitch({ theme, setTheme, mobile = false }) {
   );
 }
 
-/* Preloader ---------------------------------------------------------------
-   Runs once per browser tab session. A curtain with a counting percentage,
-   then it lifts. Skipped entirely for reduced-motion users. */
-export function Preloader({ onDone }) {
-  const reduced = useReducedMotion();
-  const [pct, setPct] = useState(0);
-  const [lifting, setLifting] = useState(false);
-  const [gone, setGone] = useState(() => {
-    if (typeof window === "undefined") return true;
-    try {
-      return sessionStorage.getItem("intro-played") === "1";
-    } catch {
-      return false;
-    }
-  });
-
-  const finish = useCallback(() => {
-    try {
-      sessionStorage.setItem("intro-played", "1");
-    } catch {
-      /* ignore */
-    }
-    document.documentElement.classList.remove("intro-lock");
-    setGone(true);
-    onDone?.();
-  }, [onDone]);
-
-  useEffect(() => {
-    if (gone) return;
-    if (reduced) {
-      finish();
-      return;
-    }
-    document.documentElement.classList.add("intro-lock");
-    const controls = animate(0, 100, {
-      duration: 1.5,
-      ease: [0.5, 0, 0.2, 1],
-      onUpdate: (v) => setPct(Math.round(v)),
-      onComplete: () => setLifting(true),
-    });
-    return () => controls.stop();
-  }, [gone, reduced, finish]);
-
-  // Safety net: never let a stuck animation leave the curtain up.
-  useEffect(() => {
-    if (gone || reduced) return;
-    const t = setTimeout(finish, 4000);
-    return () => clearTimeout(t);
-  }, [gone, reduced, finish]);
-
-  useEffect(
-    () => () => document.documentElement.classList.remove("intro-lock"),
-    [],
-  );
-
-  if (gone || reduced) return null;
-
-  return (
-    <motion.div
-      className="intro"
-      data-testid="intro-preloader"
-      initial={{ y: 0 }}
-      animate={{ y: lifting ? "-101%" : 0 }}
-      transition={{ duration: 0.9, delay: lifting ? 0.25 : 0, ease: [0.76, 0, 0.24, 1] }}
-      onAnimationComplete={() => { if (lifting) finish(); }}
-      aria-hidden="true"
-    >
-      <div className="intro-inner">
-        <span className="intro-name">ESHANI SOMWANSHI</span>
-        <span className="intro-role">Product / UX Designer</span>
-      </div>
-      <span className="intro-count num">{String(pct).padStart(3, "0")}</span>
-      <span className="intro-bar" style={{ transform: `scaleX(${pct / 100})` }} />
-    </motion.div>
-  );
-}
+/* Preloader moved to components/site/Preloader.jsx — bouncing letters. */

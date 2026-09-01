@@ -5,12 +5,10 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "@/index.css";
 import App from "@/App";
 import CaseStudyPage from "@/CaseStudyPage";
+import { ReadModeProvider } from "@/components/site/ReadMode";
 
-// Lenis controls scroll position, so the browser's own restoration fights it
-// on back/forward navigation.
-if ("scrollRestoration" in window.history) {
-  window.history.scrollRestoration = "manual";
-}
+// Native scroll restoration is correct again now that Lenis is gone — the
+// browser returns people to where they were on back/forward.
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -26,11 +24,13 @@ root.render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
+        <ReadModeProvider>
         <Routes>
           <Route path="/" element={<App />} />
           <Route path="/work/:slug" element={<CaseStudyPage />} />
           <Route path="*" element={<App />} />
         </Routes>
+        </ReadModeProvider>
       </BrowserRouter>
     </QueryClientProvider>
   </React.StrictMode>,

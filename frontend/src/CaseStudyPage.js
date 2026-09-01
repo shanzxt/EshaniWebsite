@@ -1,9 +1,10 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { motion, useReducedMotion, useScroll } from "framer-motion";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import RotateCard from "./components/devices/RotateCard";
-import Lenis from "lenis";
+import BeforeAfter from "./components/site/BeforeAfter";
+import { ReadModeToggle, useReadMode } from "./components/site/ReadMode";
 import {
   EASE,
   IMG,
@@ -19,32 +20,14 @@ export default function CaseStudyPage() {
   const { slug } = useParams();
   const [theme, setTheme] = useTheme();
   const reduced = useReducedMotion();
-  const lenisRef = useRef(null);
   const { scrollYProgress } = useScroll();
+  const [readMode] = useReadMode();
   const study = caseStudies.find((s) => s.slug === slug);
 
-  // Same momentum scrolling as the home page — without this the case pages
-  // felt like a different site.
+  // Lenis removed — native scrolling matches the OS momentum curve, which is
+  // what a hiring manager's trackpad expects.
   useEffect(() => {
-    if (reduced) return;
-    const lenis = new Lenis({ lerp: 0.1 });
-    lenisRef.current = lenis;
-    let raf;
-    const loop = (t) => {
-      lenis.raf(t);
-      raf = requestAnimationFrame(loop);
-    };
-    raf = requestAnimationFrame(loop);
-    return () => {
-      cancelAnimationFrame(raf);
-      lenis.destroy();
-      lenisRef.current = null;
-    };
-  }, [reduced]);
-
-  useEffect(() => {
-    if (lenisRef.current) lenisRef.current.scrollTo(0, { immediate: true });
-    else window.scrollTo(0, 0);
+    window.scrollTo(0, 0);
   }, [slug]);
 
   // Keep the document title in sync — recruiters bookmark and share these.
@@ -144,6 +127,7 @@ export default function CaseStudyPage() {
 
         <section className="cs-overview container">
           <Reveal><p className="lede">{study.overview}</p></Reveal>
+          <ReadModeToggle minutes={Math.max(3, study.chapters.length + 1)} />
           {study.confidential && (
             <Reveal delay={0.1}>
               <p className="note-strip" data-testid="case-nda-note">
@@ -161,8 +145,25 @@ export default function CaseStudyPage() {
                 {String(i + 1).padStart(2, "0")} — {ch.label}
               </p>
               <h2>{ch.title}</h2>
-              <p className="cs-body">{ch.body}</p>
+              {readMode === "skim" ? (
+                <p className="cs-skim">{ch.skim || ch.body}</p>
+              ) : (
+                <p className="cs-body">{ch.body}</p>
+              )}
             </Reveal>
+
+            {ch.beforeAfter && (
+              <BeforeAfter
+                before={IMG(ch.beforeAfter[0])}
+                after={IMG(ch.beforeAfter[1])}
+                beforeLabel={ch.beforeAfter[2]}
+                afterLabel={ch.beforeAfter[3]}
+                beforeAlt={`${ch.beforeAfter[2]} — ${study.company}`}
+                afterAlt={`${ch.beforeAfter[3]} — ${study.company}`}
+                caption={ch.beforeAfter[4]}
+                testId={`case-beforeafter-${study.slug}`}
+              />
+            )}
 
             {ch.images && (
               <div className={ch.phone ? "phone-row" : "cs-art"}>

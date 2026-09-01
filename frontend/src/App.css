@@ -32,9 +32,14 @@
   --grain-blend: multiply;
   --grain-opacity: .05;
 
-  --font-display: 'Outfit', system-ui, sans-serif;
+  /* Three families, not four. Outfit and Manrope were two geometric sans with
+     near-identical proportions — the cost of two, the variety of one, and both
+     are the Framer/Webflow defaults. Bricolage Grotesque is variable with an
+     optical-size axis, so it carries display and body on its own.
+     If you want quieter body text, set --font-body to 'Instrument Sans'. */
+  --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
   --font-serif: 'Instrument Serif', Georgia, serif;
-  --font-body: 'Manrope', system-ui, sans-serif;
+  --font-body: 'Bricolage Grotesque', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 
   --nav-h: 78px;
@@ -103,12 +108,10 @@
 
 html { -webkit-text-size-adjust: 100%; }
 
-/* Lenis owns scrolling. Native smooth-scroll must stay off or the two fight
-   each other and produce the stutter. */
-html.lenis, html.lenis body { height: auto; }
-.lenis.lenis-smooth { scroll-behavior: auto !important; }
-.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
-.lenis.lenis-stopped { overflow: hidden; }
+/* Native scrolling. Lenis was removed — its momentum curve desynced from the
+   macOS trackpad, which is the machine most of this audience is on. */
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 
 body {
   margin: 0;
@@ -221,51 +224,7 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
 .split-i { display: inline-block; will-change: transform; }
 
 /* ---------- preloader ---------- */
-.intro-lock { overflow: hidden; }
-.intro {
-  position: fixed;
-  inset: 0;
-  z-index: 500;
-  background: var(--inv-bg);
-  color: var(--inv-ink);
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  padding: var(--edge);
-  gap: 2rem;
-}
-.intro-inner { display: flex; flex-direction: column; gap: .5rem; }
-.intro-name {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: clamp(1.8rem, 6vw, 4.5rem);
-  letter-spacing: -.04em;
-  line-height: .95;
-}
-.intro-role {
-  font-family: var(--font-mono);
-  font-size: .74rem;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-  color: var(--accent);
-}
-.intro-count {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: clamp(2.5rem, 9vw, 7rem);
-  letter-spacing: -.05em;
-  line-height: .85;
-  color: var(--inv-faint);
-}
-.intro-bar {
-  position: absolute;
-  left: 0; bottom: 0;
-  height: 2px;
-  width: 100%;
-  background: var(--accent);
-  transform-origin: left;
-  transition: transform .1s linear;
-}
+/* Preloader styles now live in components/site/preloader.css */
 
 /* ---------- header ---------- */
 .site-header {
@@ -505,7 +464,8 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
   font-family: var(--font-display);
   font-weight: 700;
   font-size: clamp(3.4rem, 13.2vw, 12.5rem);
-  letter-spacing: -.05em;
+  /* Tight tracking only pays off at display sizes. */
+  letter-spacing: -.025em;
   line-height: .92;
   white-space: nowrap;
   padding-left: var(--edge);
@@ -663,7 +623,16 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
   letter-spacing: -.028em;
   color: var(--accent-strong);
 }
-.proof-label { margin-top: .35rem; font-size: .88rem; }
+.proof-label { margin-top: .35rem; font-size: .88rem; line-height: 1.45; }
+.proof-method {
+  margin-top: .5rem;
+  font-family: var(--font-mono);
+  font-size: .6rem;
+  letter-spacing: .04em;
+  line-height: 1.5;
+  color: var(--muted);
+  opacity: .7;
+}
 .proof-context {
   margin-top: .2rem;
   font-family: var(--font-mono);
@@ -721,7 +690,17 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
   color: var(--accent-strong);
   letter-spacing: -.02em;
 }
-.m-label { font-size: .8rem; color: var(--muted); line-height: 1.35; }
+.m-label { font-size: .8rem; color: var(--muted); line-height: 1.4; }
+/* Method line under a metric. A number without a method reads as decoration. */
+.m-method {
+  margin-top: .3rem;
+  font-family: var(--font-mono);
+  font-size: .62rem;
+  letter-spacing: .04em;
+  line-height: 1.45;
+  color: var(--muted);
+  opacity: .72;
+}
 
 /* ---------- image frames ----------
    Border + background live here so nothing double-frames. */
@@ -1218,47 +1197,42 @@ figcaption {
 .footer-row a { transition: color var(--dur-fast) var(--ease-state); }
 .footer-row a:hover { color: var(--accent); }
 
-/* ---------- custom cursor ---------- */
-.cursor-dot, .cursor-ring {
+/* ---------- contextual cursor tag ----------
+   The global dot + ring was removed. This only appears over elements that
+   opt in with data-cursor="Label" (and optionally data-cursor-img="/path"). */
+.cursor-tag {
   position: fixed;
   top: 0; left: 0;
-  pointer-events: none;
   z-index: 9999;
-  border-radius: 50%;
-}
-.cursor-dot {
-  width: 7px; height: 7px;
-  background: var(--accent);
+  pointer-events: none;
   transform: translate(-50%, -50%);
-  mix-blend-mode: difference;
-}
-.cursor-ring {
-  width: 34px; height: 34px;
-  border: 1.5px solid var(--accent);
-  transform: translate(-50%, -50%);
-  display: grid;
-  place-items: center;
-  transition: width .3s var(--ease-state), height .3s var(--ease-state),
-              background-color .3s var(--ease-state), border-color .3s var(--ease-state);
-}
-.cursor-ring[data-state="link"] { width: 56px; height: 56px; }
-.cursor-ring[data-state="media"] {
-  width: 84px; height: 84px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .5rem;
+  padding: .55rem .8rem;
+  border-radius: 3px;
   background: var(--accent);
-  border-color: var(--accent);
-}
-.cursor-label {
-  font-family: var(--font-mono);
-  font-size: .6rem;
-  letter-spacing: .1em;
-  text-transform: uppercase;
   color: var(--bg);
   opacity: 0;
-  transition: opacity .2s var(--ease-state);
+  scale: .9;
+  transition: opacity .18s var(--ease-state), scale .18s var(--ease-state);
+}
+.cursor-tag[data-visible="true"] { opacity: 1; scale: 1; }
+.cursor-tag-img {
+  display: block;
+  width: 132px;
+  height: auto;
+  border-radius: 2px;
+}
+.cursor-tag-label {
+  font-family: var(--font-mono);
+  font-size: .6rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
   white-space: nowrap;
 }
-.cursor-ring[data-state="media"] .cursor-label { opacity: 1; }
-@media (pointer: coarse) { .cursor-dot, .cursor-ring { display: none; } }
+@media (pointer: coarse) { .cursor-tag { display: none; } }
 
 /* ---------- case study page ---------- */
 .cs-header {
@@ -1331,7 +1305,7 @@ figcaption {
   margin: .7rem 0 1rem;
   max-width: 24ch;
 }
-.cs-body { color: var(--muted); max-width: 62ch; font-size: 1rem; line-height: 1.66; }
+.cs-body { color: var(--muted); max-width: 62ch; font-size: 1.02rem; line-height: 1.72; }
 .cs-art { margin-top: 2rem; display: grid; gap: 1.4rem; max-width: 760px; }
 .cs-shot { border: 1px solid var(--line); background: transparent; overflow: hidden; }
 .cs-shot figcaption { margin: 0; padding: .7rem .9rem; background: var(--card); border-top: 1px solid var(--line); }
@@ -1731,4 +1705,69 @@ figcaption {
     opacity: 0.6;
     transform: scale(0.75);
   }
+}
+/* ========================================================================
+   Additions — testimonial, NDA note, lead media, skimmable body
+   ======================================================================== */
+
+/* ---------- reference / testimonial ---------- */
+.testimonial-section { padding-top: 0; }
+.testimonial {
+  margin: 0;
+  max-width: 58ch;
+  border-left: 2px solid var(--accent);
+  padding: .3rem 0 .3rem clamp(1.2rem, 3vw, 2.2rem);
+}
+.testimonial blockquote {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(1.35rem, 2.6vw, 2rem);
+  line-height: 1.4;
+  color: var(--ink);
+}
+.testimonial figcaption {
+  margin-top: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: .2rem;
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  letter-spacing: .08em;
+}
+.testimonial .t-name { color: var(--ink); text-transform: uppercase; }
+.testimonial .t-title { color: var(--muted); }
+
+/* ---------- NDA note on the confidential project card ---------- */
+.nda-note {
+  margin: 1rem 0 0;
+  padding: .8rem 1rem;
+  border: 1px dashed var(--line);
+  border-radius: 3px;
+  background: var(--surface);
+  font-size: .86rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+/* ---------- media inside the lead panel ---------- */
+.lead-media {
+  margin: 1.8rem 0 .4rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--card);
+}
+
+/* Two-up metric rows now that the third pseudo-metric is gone. */
+.lead-metrics { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+.case-metrics { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+.proj-metrics { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+
+/* Longer leading on the paragraphs recruiters skim. */
+.summary { line-height: 1.68; }
+.lede { line-height: 1.62; }
+
+@media (max-width: 720px) {
+  .proof-grid { grid-template-columns: repeat(2, 1fr); }
+  .proof-item:nth-child(3) { border-left: none; padding-left: 0; }
 }

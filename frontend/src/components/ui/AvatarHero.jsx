@@ -9,7 +9,8 @@ import { Magnetic } from "../../primitives";
  * Inspired by uxdularia.com:
  * - Bold typographic backdrop ("ESHANI")
  * - Interactive mouse-tracking stylized avatar with lifelike eyes
- * - Multi-layer drifting & parallax animated clouds & floating bubble clusters
+ * - Two drifting parallax cloud layers (bubble cluster removed: too much
+ *   competing motion above the headline)
  * - Clean call-to-action buttons
  */
 export default function AvatarHero({ go, theme = "paper" }) {
@@ -33,9 +34,6 @@ export default function AvatarHero({ go, theme = "paper" }) {
 
   const cloudFrontX = useTransform(smoothX, [-1, 1], [-40, 40]);
   const cloudFrontY = useTransform(smoothY, [-1, 1], [-20, 20]);
-
-  const bubbleLeftX = useTransform(smoothX, [-1, 1], [25, -25]);
-  const bubbleRightX = useTransform(smoothX, [-1, 1], [-35, 35]);
 
   const handleMouseMove = (e) => {
     if (reduced) return;
@@ -87,34 +85,12 @@ export default function AvatarHero({ go, theme = "paper" }) {
           </svg>
         </motion.div>
 
-        {/* Layer 3: Floating Organic Bubbles */}
-        <div className="hero-bubble-group" aria-hidden="true">
-          <motion.div
-            className="bubble-cluster bubble-left"
-            style={reduced ? {} : { x: bubbleLeftX }}
-          >
-            <div className="cloud-bubble b-1" />
-            <div className="cloud-bubble b-2" />
-            <div className="cloud-bubble b-3" />
-            <div className="cloud-bubble b-4" />
-          </motion.div>
-
-          <motion.div
-            className="bubble-cluster bubble-right"
-            style={reduced ? {} : { x: bubbleRightX }}
-          >
-            <div className="cloud-bubble b-5" />
-            <div className="cloud-bubble b-6" />
-            <div className="cloud-bubble b-7" />
-          </motion.div>
-        </div>
-
-        {/* Layer 4: Interactive Character Avatar (Eshani) */}
+        {/* Layer 3: Interactive Character Avatar (Eshani) */}
         <div className="hero-avatar-container">
-          <InteractiveAvatar size={460} theme={theme} />
+          <InteractiveAvatar size={400} theme={theme} />
         </div>
 
-        {/* Layer 5: Foreground Cloud Silhouette Bed */}
+        {/* Layer 4: Foreground Cloud Silhouette Bed */}
         <motion.div
           className="hero-cloud-layer hero-cloud-front"
           style={reduced ? {} : { x: cloudFrontX, y: cloudFrontY }}
@@ -144,13 +120,14 @@ export default function AvatarHero({ go, theme = "paper" }) {
         </div>
 
         <h1 className="hero-main-title">
-          Designing clarity into <span className="hero-serif-accent">complex systems.</span>
+          Four minutes is how long a{" "}
+          <span className="hero-serif-accent">clinician has.</span>
         </h1>
 
         <p className="hero-lede-text">
-          I work across healthcare, AI, and enterprise products — using research,
-          systems thinking, and interactive craft to make complex experiences easier
-          to understand and navigate.
+          So that&rsquo;s what I design for. Product and UX design across healthcare, AI,
+          and enterprise systems — diagnostic tools clinicians trust under time pressure,
+          AI companions people actually come back to, and 0&rarr;1 platforms that ship.
         </p>
 
         <div className="hero-btn-group">
