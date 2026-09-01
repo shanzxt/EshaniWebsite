@@ -100,24 +100,24 @@ const navItems = [
 ];
 
 /* ========================================================================
-   Cursor — a contextual label (and optional preview) over media only.
+   Cursor — dot + ring, with a contextual label (and optional preview image)
+   when hovering project media.
 
-   The global dot + ring was removed: it replaced the OS cursor everywhere,
-   added spring latency on trackpads, and hid native affordances. What was
-   actually useful was the label over project media, so that is all that
-   is left. Add data-cursor="Label" and optionally data-cursor-img="/path"
-   to any element to opt in.
+   Add data-cursor="Label" to any element to grow the ring into a filled
+   accent circle with that label. Add data-cursor-img="/path" alongside it
+   to also show a small preview thumbnail above the ring.
    ======================================================================== */
 
 function Cursor() {
   const reduced = useReducedMotion();
   const [enabled, setEnabled] = useState(false);
+  const [state, setState] = useState("default");
   const [label, setLabel] = useState("");
   const [img, setImg] = useState("");
-  const x = useMotionValue(-200);
-  const y = useMotionValue(-200);
-  const rx = useSpring(x, { stiffness: 420, damping: 34, mass: 0.3 });
-  const ry = useSpring(y, { stiffness: 420, damping: 34, mass: 0.3 });
+  const x = useMotionValue(-100);
+  const y = useMotionValue(-100);
+  const rx = useSpring(x, { stiffness: 240, damping: 22, mass: 0.4 });
+  const ry = useSpring(y, { stiffness: 240, damping: 22, mass: 0.4 });
 
   useEffect(() => {
     if (reduced || !window.matchMedia("(pointer:fine)").matches) return;
@@ -129,8 +129,15 @@ function Cursor() {
     };
     const over = (e) => {
       const media = e.target.closest("[data-cursor]");
-      setLabel(media ? media.dataset.cursor : "");
-      setImg(media ? media.dataset.cursorImg || "" : "");
+      if (media) {
+        setState("media");
+        setLabel(media.dataset.cursor);
+        setImg(media.dataset.cursorImg || "");
+        return;
+      }
+      setLabel("");
+      setImg("");
+      setState(e.target.closest("a,button,input,textarea") ? "link" : "default");
     };
 
     window.addEventListener("mousemove", move, { passive: true });
@@ -144,15 +151,19 @@ function Cursor() {
   if (!enabled) return null;
 
   return (
-    <motion.div
-      className="cursor-tag"
-      style={{ x: rx, y: ry }}
-      data-visible={label ? "true" : "false"}
-      aria-hidden="true"
-    >
-      {img && <img src={img} alt="" className="cursor-tag-img" />}
-      <span className="cursor-tag-label">{label}</span>
-    </motion.div>
+    <>
+      <motion.div className="cursor-dot" style={{ x, y }} aria-hidden="true" />
+      <motion.div
+        className="cursor-ring"
+        style={{ x: rx, y: ry }}
+        data-state={state}
+        data-has-img={img ? "true" : "false"}
+        aria-hidden="true"
+      >
+        {img && <img src={img} alt="" className="cursor-preview-img" />}
+        <span className="cursor-label">{label}</span>
+      </motion.div>
+    </>
   );
 }
 
