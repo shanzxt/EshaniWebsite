@@ -66,6 +66,15 @@ CRA is wrapped with **craco** (`craco.config.js`) rather than plain `react-scrip
 
 `backend/server.py` is a single-file FastAPI app: all routes are on an `/api`-prefixed `APIRouter` mounted onto `app`. Two route groups: a legacy `StatusCheck` CRUD pair (`/api/status`) and the contact form endpoint (`POST /api/messages`), which writes to MongoDB (`db.messages`) and optionally sends an email notification via Resend. There's no ORM/model layer beyond Pydantic request/response models defined inline in this file.
 
+### Deploy workflow (git → Vercel)
+
+The GitHub repo has two relevant branches: `main` (preview) and `production` (wired to Vercel's live deploy). Default flow for any change:
+
+1. Commit and push to `main`. This is what an unqualified "push" means — it deploys a Vercel preview, not the live site.
+2. Only after the user reviews and explicitly says to go live ("push to production", "ship it", etc.), fast-forward `production` to `main`: `git push origin main:production`. `production` should always be a strict ancestor of `main` (no divergent commits of its own) — if unsure, check first with `git rev-list --left-right --count origin/production...origin/main`.
+
+Never push to `production` on a bare "push" — wait for the explicit go-ahead.
+
 ### Testing protocol (`test_result.md`)
 
 The repo root has a `test_result.md` file with a structured YAML-in-Markdown protocol for coordinating between a "main" agent and a "testing" agent (used by the emergent.sh workflow this project was scaffolded from). If asked to record or update test status, follow the format already documented inside that file rather than inventing a new one.
