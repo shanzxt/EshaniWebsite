@@ -32,9 +32,9 @@ export default function CaseStudyPage() {
 
   // Keep the document title in sync — recruiters bookmark and share these.
   useEffect(() => {
-    const base = "Eshani Somwanshi — Product & UX Designer";
+    const base = "Eshani Somwanshi · Product & UX Designer";
     document.title = study
-      ? `${study.titleLines.join(" ")} — ${study.company} | Eshani Somwanshi`
+      ? `${study.titleLines.join(" ")} · ${study.company} | Eshani Somwanshi`
       : base;
     return () => {
       document.title = base;
@@ -131,7 +131,7 @@ export default function CaseStudyPage() {
           {study.confidential && (
             <Reveal delay={0.1}>
               <p className="note-strip" data-testid="case-nda-note">
-                This engagement is under NDA — screens aren&rsquo;t public yet. The process
+                This engagement is under NDA: screens aren&rsquo;t public yet. The process
                 below is shareable; the pixels aren&rsquo;t. Happy to walk through the work live.
               </p>
             </Reveal>
@@ -142,7 +142,7 @@ export default function CaseStudyPage() {
           <section className="cs-chapter container" key={ch.label} data-testid={`case-chapter-${i + 1}`}>
             <Reveal>
               <p className="section-label">
-                {String(i + 1).padStart(2, "0")} — {ch.label}
+                {String(i + 1).padStart(2, "0")} · {ch.label}
               </p>
               <h2>{ch.title}</h2>
               {readMode === "skim" ? (
@@ -158,8 +158,8 @@ export default function CaseStudyPage() {
                 after={IMG(ch.beforeAfter[1])}
                 beforeLabel={ch.beforeAfter[2]}
                 afterLabel={ch.beforeAfter[3]}
-                beforeAlt={`${ch.beforeAfter[2]} — ${study.company}`}
-                afterAlt={`${ch.beforeAfter[3]} — ${study.company}`}
+                beforeAlt={`${ch.beforeAfter[2]}, ${study.company}`}
+                afterAlt={`${ch.beforeAfter[3]}, ${study.company}`}
                 caption={ch.beforeAfter[4]}
                 testId={`case-beforeafter-${study.slug}`}
               />

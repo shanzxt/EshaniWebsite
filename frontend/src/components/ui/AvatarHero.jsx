@@ -60,7 +60,10 @@ export default function AvatarHero({ go, theme = "paper" }) {
           aria-hidden="true"
         >
           <span className="backdrop-name">ESHANI</span>
-          <span className="backdrop-sub">A USER EXPERIENCE DESIGNER</span>
+          <span className="backdrop-sub">
+            <span className="backdrop-sub-line">Product Designer</span>
+            <span className="backdrop-sub-line">User Experience Designer</span>
+          </span>
         </motion.div>
 
         {/* Layer 2: Background Clouds */}
@@ -116,7 +119,7 @@ export default function AvatarHero({ go, theme = "paper" }) {
             <span className="avail-pulse" />
             Available for product design roles
           </span>
-          <span className="hero-location-pill">Chicago, IL · Healthcare · AI · Systems</span>
+          <span className="hero-location-pill">San Francisco, CA · Healthcare · AI · Systems</span>
         </div>
 
         <h1 className="hero-main-title">
@@ -125,9 +128,9 @@ export default function AvatarHero({ go, theme = "paper" }) {
         </h1>
 
         <p className="hero-lede-text">
-          So that&rsquo;s what I design for. Product and UX design across healthcare, AI,
-          and enterprise systems — diagnostic tools clinicians trust under time pressure,
-          AI companions people actually come back to, and 0&rarr;1 platforms that ship.
+          Designing clarity into complex systems. I work across healthcare, AI, and
+          enterprise products, using research, systems thinking, and interactive craft
+          to make complex experiences easier to understand and navigate.
         </p>
 
         <div className="hero-btn-group">

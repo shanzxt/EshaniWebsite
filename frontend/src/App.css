@@ -45,6 +45,7 @@
   --nav-h: 78px;
   --container: 1320px;
   --edge: clamp(1.25rem, 5vw, 4rem);
+  --radius-btn: 8px;
 
   --ease-enter: cubic-bezier(.22, .61, .36, 1);
   --ease-state: cubic-bezier(.65, 0, .35, 1);
@@ -419,6 +420,7 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
   gap: .6em;
   min-height: 44px;
   position: relative;
+  border-radius: var(--radius-btn);
   background-repeat: no-repeat;
   background-size: 100% 0%;
   background-position: 50% 100%;
@@ -675,6 +677,7 @@ button { font: inherit; background: none; border: none; cursor: pointer; color: 
   font-family: var(--font-mono);
   font-size: .68rem;
   border: 1px solid var(--line);
+  border-radius: var(--radius-btn);
   padding: .35em .75em;
   color: var(--secondary);
   text-transform: uppercase;
@@ -760,6 +763,7 @@ figcaption {
   padding: .45em .85em;
   letter-spacing: .06em;
   text-transform: uppercase;
+  border-radius: var(--radius-btn);
 }
 .lead-panel h3 {
   font-family: var(--font-display);
@@ -955,13 +959,33 @@ figcaption {
   letter-spacing: .04em;
 }
 
-/* ---------- capabilities ---------- */
-.capabilities-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2.4rem; }
-.cap-card { border-top: 2px solid var(--secondary); padding-top: 1.3rem; transition: border-color .3s var(--ease-state); }
-.cap-card:hover { border-top-color: var(--accent); }
-.cap-card h3 { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; margin-bottom: .9rem; letter-spacing: -.018em; }
-.cap-card ul { display: flex; flex-direction: column; gap: .5rem; }
-.cap-card li { font-size: .9rem; color: var(--muted); }
+/* ---------- what I offer (accordion) ---------- */
+.offer-list { border-bottom: 1px solid var(--line); }
+.offer-item { border-top: 1px solid var(--line); }
+.offer-head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.7rem 0;
+  text-align: left;
+  min-height: 44px;
+}
+.offer-head h3 {
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 2.6vw, 1.7rem);
+  font-weight: 600;
+  letter-spacing: -.02em;
+}
+.offer-head svg { flex: none; color: var(--muted); transition: color var(--dur-fast) var(--ease-state); }
+.offer-head[aria-expanded="true"] svg,
+.offer-head:hover svg { color: var(--accent-strong); }
+.offer-detail { overflow: hidden; }
+.offer-detail ul { display: flex; flex-direction: column; gap: .6rem; padding: 0 0 1.7rem; }
+.offer-detail li { font-size: .9rem; color: var(--muted); position: relative; padding-left: 1.1em; }
+.offer-detail li::before { content: "•"; position: absolute; left: 0; color: var(--accent); }
+.offer-empty { padding: 0 0 1.7rem; font-size: .85rem; color: var(--muted); font-style: italic; }
 
 /* ---------- tool marquee ---------- */
 .tool-marquee {
@@ -1028,7 +1052,13 @@ figcaption {
 .exp-detail { overflow: hidden; }
 .exp-detail ul { display: flex; flex-direction: column; gap: .6rem; padding-top: 1rem; }
 .exp-detail li { font-size: .9rem; color: var(--muted); position: relative; padding-left: 1.1em; }
-.exp-detail li::before { content: "—"; position: absolute; left: 0; color: var(--accent); }
+.exp-detail li::before { content: "•"; position: absolute; left: 0; color: var(--accent); }
+
+/* ---------- lead subtitle + checklist highlights (work section) ---------- */
+.lead-subtitle { color: var(--muted); font-size: 1.02rem; max-width: 46ch; margin-top: .5rem; }
+.case-highlights { display: flex; flex-direction: column; gap: .7rem; margin-top: 1.6rem; }
+.case-highlights li { display: flex; align-items: flex-start; gap: .6rem; font-size: .88rem; line-height: 1.5; color: var(--muted); }
+.case-highlights svg { flex: none; margin-top: .2rem; color: var(--accent-strong); }
 
 /* ---------- about ---------- */
 .about-grid { display: grid; grid-template-columns: .72fr 1.28fr; gap: clamp(2rem, 4vw, 3.5rem); align-items: start; }
@@ -1055,22 +1085,6 @@ figcaption {
 }
 .about-facts dt { font-family: var(--font-mono); font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
 .about-facts dd { margin: .3rem 0 0; font-size: .94rem; }
-
-/* ---------- resume ---------- */
-.resume-card {
-  border: 1px solid var(--line);
-  background: var(--card);
-  padding: clamp(1.75rem, 4.5vw, 3.2rem);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1.5rem;
-  transition: border-color var(--dur-fast) var(--ease-state);
-}
-.resume-card:hover { border-color: var(--ink); }
-.resume-card h3 { font-family: var(--font-display); font-size: 1.45rem; font-weight: 600; letter-spacing: -.022em; }
-.resume-card p { margin-top: .45rem; color: var(--muted); font-size: .92rem; }
 
 /* ---------- contact ---------- */
 .contact {
@@ -1368,7 +1382,6 @@ figcaption {
   .proj-compact .proj-body { grid-template-columns: 1fr; gap: 1.4rem; }
   .proj-metrics { flex-direction: row; flex-wrap: wrap; gap: 1.6rem 2.2rem; }
   .impact-grid { grid-template-columns: repeat(3, 1fr); }
-  .capabilities-grid { grid-template-columns: repeat(2, 1fr); }
   .exp-item { grid-template-columns: 1fr; gap: .8rem; }
   .exp-dates { text-align: left; }
   .about-grid { grid-template-columns: 1fr; }
@@ -1391,7 +1404,6 @@ figcaption {
   .frag-tvl { width: 30%; right: 0; top: auto; bottom: -2%; }
   .proof-grid { grid-template-columns: 1fr 1fr; }
   .impact-grid { grid-template-columns: 1fr 1fr; }
-  .capabilities-grid { grid-template-columns: 1fr; gap: 2rem; }
   .about-facts { grid-template-columns: 1fr; }
   .chapter-art figure { max-width: 100%; }
   .lead-metrics { grid-template-columns: 1fr 1fr; }
@@ -1485,13 +1497,19 @@ figcaption {
 }
 
 .backdrop-sub {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 1rem;
+}
+.backdrop-sub-line {
   font-family: var(--font-mono);
   font-size: clamp(0.7rem, 1.2vw, 0.95rem);
   letter-spacing: 0.25em;
   text-transform: uppercase;
   color: var(--muted);
   opacity: 0.7;
-  margin-top: 1rem;
 }
 
 /* Cloud Layers */
@@ -1729,35 +1747,8 @@ figcaption {
   }
 }
 /* ========================================================================
-   Additions — testimonial, NDA note, lead media, skimmable body
+   Additions — NDA note, lead media, skimmable body
    ======================================================================== */
-
-/* ---------- reference / testimonial ---------- */
-.testimonial-section { padding-top: 0; }
-.testimonial {
-  margin: 0;
-  max-width: 58ch;
-  border-left: 2px solid var(--accent);
-  padding: .3rem 0 .3rem clamp(1.2rem, 3vw, 2.2rem);
-}
-.testimonial blockquote {
-  margin: 0;
-  font-family: var(--font-serif);
-  font-size: clamp(1.35rem, 2.6vw, 2rem);
-  line-height: 1.4;
-  color: var(--ink);
-}
-.testimonial figcaption {
-  margin-top: 1.4rem;
-  display: flex;
-  flex-direction: column;
-  gap: .2rem;
-  font-family: var(--font-mono);
-  font-size: .72rem;
-  letter-spacing: .08em;
-}
-.testimonial .t-name { color: var(--ink); text-transform: uppercase; }
-.testimonial .t-title { color: var(--muted); }
 
 /* ---------- NDA note on the confidential project card ---------- */
 .nda-note {
@@ -1793,3 +1784,23 @@ figcaption {
   .proof-grid { grid-template-columns: repeat(2, 1fr); }
   .proof-item:nth-child(3) { border-left: none; padding-left: 0; }
 }
+
+/* ---------- back to top (sticky) ---------- */
+.back-to-top {
+  position: fixed;
+  right: clamp(1rem, 3vw, 2rem);
+  bottom: clamp(1rem, 3vw, 2rem);
+  z-index: 40;
+  width: 46px;
+  height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ink);
+  color: var(--bg);
+  border-radius: var(--radius-btn);
+  box-shadow: 0 6px 18px rgba(var(--shadow-rgb), .18);
+}
+.back-to-top:hover, .back-to-top:focus-visible { background: var(--accent-strong); }
+.back-to-top svg { transition: transform .3s var(--ease-state); }
+.back-to-top:hover svg { transform: translateY(-2px); }

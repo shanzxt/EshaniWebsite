@@ -102,7 +102,7 @@ export default function BeforeAfter({
           className="ba-handle"
           style={{ left: `${pct}%` }}
           onKeyDown={onKey}
-          aria-label={`Comparison slider — ${Math.round(pct)}% ${beforeLabel}`}
+          aria-label={`Comparison slider, ${Math.round(pct)}% ${beforeLabel}`}
           aria-valuenow={Math.round(pct)}
           aria-valuemin={0}
           aria-valuemax={100}

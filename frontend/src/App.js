@@ -9,7 +9,7 @@ import {
   useScroll,
   useSpring,
 } from "framer-motion";
-import { ArrowUpRight, Menu, Minus, Plus, Send } from "lucide-react";
+import { ArrowUp, ArrowUpRight, Check, Menu, Minus, Plus, Send } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import {
   CountUp,
@@ -43,11 +43,14 @@ const proof = [
   [25, "%", "Higher task completion", "Rebecca Everlene Trust Co.", "Pre/post content restructure"],
 ];
 
-const capabilities = [
-  ["Product thinking", ["Product strategy", "Information architecture", "Journey mapping", "Competitive analysis", "A/B testing"]],
-  ["Research & validation", ["User research", "Usability testing", "Heuristic evaluation", "UserTesting", "Perplexity, Claude"]],
-  ["Complex product design", ["Design for AI", "Design systems", "Accessibility (WCAG 2.2)", "Regulated / healthcare workflows"]],
-  ["Prototyping & craft", ["Figma, Figma Make", "Framer, Lovable, Cursor AI", "HTML5/CSS, JavaScript", "Illustrator, Photoshop, Miro"]],
+/* TODO(Eshani): fill in the subpoints for each offering (bullet lists, same
+   pattern as `experience` below). Left empty for now per your notes — an
+   accordion with nothing inside just shows a "Detail coming soon" line. */
+const offerings = [
+  ["UX/UI Design", []],
+  ["Graphic Design", []],
+  ["Branding", []],
+  ["Industrial Design", []],
 ];
 
 const experience = [
@@ -59,7 +62,7 @@ const experience = [
       "Compressed time-to-prototype by 50% by integrating AI-automated design workflows across 10+ features."]],
   ["Product Designer", "OptraHealth", "Dec 2024 – Mar 2025 · San Jose, CA",
     "Primary designer for Zoe, an AI companion, plus onboarding, patient management, and provider monitoring for a health-tech SaaS platform.",
-    ["Shipped mobile onboarding flows, a patient management dashboard, and provider monitoring — lifting weekly engagement by 30%.",
+    ["Shipped mobile onboarding flows, a patient management dashboard, and provider monitoring, lifting weekly engagement by 30%.",
       "Designed Zoe's interaction layer from the ground up, increasing exercise tutorial completion by 28%.",
       "Built a 100+ component Figma library adopted by PMs and engineers for independent prototyping.",
       "Ran 20+ usability and heuristic evaluation sessions, cutting onboarding drop-off among parents by 20%."]],
@@ -75,28 +78,17 @@ const experience = [
 ];
 
 const tools = [
-  ["figma", "Figma"], ["framer", "Framer"], ["miro", "Miro"], ["adobephotoshop", "Photoshop"],
-  ["adobeillustrator", "Illustrator"], ["html5", "HTML5"], ["javascript", "JavaScript"],
-  ["perplexity", "Perplexity"], ["anthropic", "Claude"], ["cursor", "Cursor"], ["openai", "ChatGPT"],
+  ["figma", "Figma"], ["framer", "Framer"], ["anthropic", "Claude"], ["openai", "ChatGPT"],
+  ["miro", "Miro"], ["adobephotoshop", "Photoshop"], ["adobeillustrator", "Illustrator"],
+  ["adobeaftereffects", "After Effects"], ["cursor", "Cursor"], ["canva", "Canva"],
+  ["adobecreativecloud", "Adobe CC"], ["wordpress", "WordPress"], ["visualstudiocode", "VS Code"],
+  ["axure", "Axure RP"], ["html5", "HTML5"], ["javascript", "JavaScript"], ["perplexity", "Perplexity"],
 ];
 
-/* TODO(Eshani): replace with a real quote before you ship. Two sentences,
-   a name, a title. Ask your OptraHealth lead or your current PM this week —
-   this block does more for interview conversion than anything else on the
-   page. If you can't get one yet, delete the <Testimonial /> call in <App />
-   rather than shipping a placeholder. */
-const testimonial = {
-  quote:
-    "Eshani took the most ambiguous part of our roadmap and turned it into something engineering could actually build. She asked the questions the rest of us were avoiding.",
-  name: "Name Surname",
-  title: "Title, Company",
-};
-
 const navItems = [
+  ["top", "Home"],
   ["work", "Work"],
-  ["experience", "Experience"],
   ["about", "About"],
-  ["resume", "Resume"],
 ];
 
 /* ========================================================================
@@ -195,28 +187,6 @@ function ToolMarquee({ theme }) {
 }
 
 /* ========================================================================
-   Testimonial
-   ======================================================================== */
-
-function Testimonial() {
-  return (
-    <section className="section testimonial-section" aria-label="Reference">
-      <div className="container">
-        <Reveal>
-          <figure className="testimonial" data-testid="testimonial">
-            <blockquote>{testimonial.quote}</blockquote>
-            <figcaption>
-              <span className="t-name">{testimonial.name}</span>
-              <span className="t-title">{testimonial.title}</span>
-            </figcaption>
-          </figure>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
-/* ========================================================================
    02 — chaptered case study (EYE AI)
    ======================================================================== */
 
@@ -244,10 +214,13 @@ function CaseStudy({ go }) {
     <div className="case">
       <div className="case-rail">
         <Reveal>
-          <p className="lead-index">Onward Technologies — EYE AI</p>
+          <p className="lead-index">Onward Technologies · EYE AI</p>
           <h3 data-testid="case-study-heading">
-            Diagnostic workflows and automated reporting for clinicians.
+            Retinal Diagnostic Platform
           </h3>
+          <p className="lead-subtitle">
+            Streamlining complex diagnostics into a unified, actionable experience.
+          </p>
           <p className="lead-role">UX Designer · Jul 2024 – Aug 2024 · Chicago, IL</p>
           <div className="case-metrics">
             <div>
@@ -261,6 +234,11 @@ function CaseStudy({ go }) {
               <div className="m-method">Against the original delivery plan</div>
             </div>
           </div>
+          <ul className="case-highlights" data-testid="case-highlights-eye-ai">
+            <li><Check size={15} /> Unified patient data, AI image analysis, and reporting into one clinical interface.</li>
+            <li><Check size={15} /> Compressed MVP delivery timeline by 3 weeks through rapid prototyping and usability validation.</li>
+            <li><Check size={15} /> Enabled clinicians to streamline diagnostic tasks 20% quicker while maintaining regulatory compliance.</li>
+          </ul>
           <nav className="chapter-nav" aria-label="Case study chapters">
             <ul>
               {chapters.map(([id, n, label]) => (
@@ -291,7 +269,7 @@ function CaseStudy({ go }) {
       <div className="chapter-flow" ref={flowRef}>
         <article className="chapter" id="ch-1">
           <Reveal>
-            <p className="section-label">01 — Research</p>
+            <p className="section-label">01 · Research</p>
             <h4>Where clinicians lose time.</h4>
             <p>
               Applied heuristic evaluation and competitive analysis across 15+ stakeholder
@@ -303,7 +281,7 @@ function CaseStudy({ go }) {
 
         <article className="chapter" id="ch-2">
           <Reveal>
-            <p className="section-label">02 — Method</p>
+            <p className="section-label">02 · Method</p>
             <h4>A defined path from research to handoff.</h4>
             <p>
               Journey mapping through wireframing, iterative prototyping, and high-fidelity
@@ -316,7 +294,7 @@ function CaseStudy({ go }) {
 
         <article className="chapter" id="ch-3">
           <Reveal>
-            <p className="section-label">03 — Interface</p>
+            <p className="section-label">03 · Interface</p>
             <h4>The clinician&rsquo;s four minutes.</h4>
             <p>
               Diagnostic workflows and automated reporting for a B2B health-tech platform MVP,
@@ -328,7 +306,7 @@ function CaseStudy({ go }) {
             <MacBookScroll
               src={IMG("eyeai-cover.png")}
               alt="Eye AI product site introducing AI-assisted diagnostic technology for clinicians."
-              caption="Product site — onboarding clinicians to the platform"
+              caption="Product site: onboarding clinicians to the platform"
               testId="case-image-cover"
             />
           </div>
@@ -361,10 +339,10 @@ function ContactForm() {
       });
       if (!res.ok) throw new Error("send failed");
       setState("sent");
-      toast.success("Message sent — thank you.");
+      toast.success("Message sent. Thank you.");
     } catch {
       setState("idle");
-      toast.error("Couldn't send just now — please email me directly instead.");
+      toast.error("Couldn't send just now, please email me directly instead.");
     }
   };
 
@@ -372,7 +350,7 @@ function ContactForm() {
     return (
       <div className="form-sent" data-testid="contact-form-success">
         <b>Message received.</b>
-        Thanks for reaching out{form.name ? `, ${form.name}` : ""} — I'll get back to you at{" "}
+        Thanks for reaching out{form.name ? `, ${form.name}` : ""}. I'll get back to you at{" "}
         {form.email} soon.
       </div>
     );
@@ -413,6 +391,8 @@ export default function App() {
   const [theme, setTheme] = useTheme();
   const [menu, setMenu] = useState(false);
   const [openExp, setOpenExp] = useState(null);
+  const [openOffer, setOpenOffer] = useState(null);
+  const [showTop, setShowTop] = useState(false);
   const [activeSection, setActiveSection] = useState("");
   const headerRef = useRef(null);
   const { scrollY, scrollYProgress } = useScroll();
@@ -420,6 +400,7 @@ export default function App() {
   /* Header compression */
   useMotionValueEvent(scrollY, "change", (y) => {
     headerRef.current?.style.setProperty("--p", Math.min(1, y / 120).toFixed(3));
+    setShowTop(y > 600);
   });
 
   /* Which nav item is current */
@@ -575,7 +556,7 @@ export default function App() {
               </div>
               <Reveal delay={0.15}>
                 <p className="desc">
-                  A hierarchy, not a grid — the work with the most to show leads,
+                  A hierarchy, not a grid: the work with the most to show leads,
                   everything else supports it.
                 </p>
               </Reveal>
@@ -584,7 +565,7 @@ export default function App() {
             <Reveal>
               <article className="lead-panel" data-testid="project-card-optra">
                 <div className="lead-top">
-                  <span className="lead-index">01 — OptraHealth</span>
+                  <span className="lead-index">01 · OptraHealth</span>
                   <span className="status-pill">Full case study</span>
                 </div>
                 <p className="lead-role" style={{ marginTop: "1.6rem" }}>
@@ -594,19 +575,25 @@ export default function App() {
                   data-cursor="MyoCircle"
                   data-cursor-img={IMG("myocircle-cover.png")}
                 >
-                  Zoe, an AI companion <span className="quiet">inside a health-tech platform.</span>
+                  Pediatric Therapy App <span className="quiet">(Zoe, an AI companion inside a health-tech platform)</span>
                 </h3>
+                <p className="lead-subtitle">
+                  Companion-guided app connecting patients, parents, and providers.
+                </p>
+                {/* TODO(Eshani): the 3 checklist bullets you sent for OptraHealth were
+                    identical to Onward's — looked like a copy/paste. Swap the paragraph
+                    below for real OptraHealth-specific highlights once you have them. */}
                 <div className="lead-media" data-cursor="MyoCircle">
                   <Wipe
                     src={IMG("myocircle-cover.png")}
-                    alt="MyoCircle mobile app across three phones — an AI-companion health app with a gamified breathe, sleep and grow theme."
+                    alt="MyoCircle mobile app across three phones, an AI-companion health app with a gamified breathe, sleep and grow theme."
                     testId="project-image-myocircle"
                   />
                 </div>
                 <div className="lead-body">
                   <div>
                     <p>
-                      Primary designer for Zoe — building the interaction layer from the
+                      Primary designer for Zoe, building the interaction layer from the
                       ground up alongside mobile onboarding, a patient management dashboard,
                       and provider monitoring. Validated across 20+ usability and heuristic
                       evaluation sessions with patients, parents, and providers.
@@ -653,7 +640,7 @@ export default function App() {
           <div className="container">
             <div className="section-head">
               <div>
-                <Reveal><p className="section-label">Case study — 02</p></Reveal>
+                <Reveal><p className="section-label">Case study 02</p></Reveal>
                 <SplitText as="h2" text="From clinician pain points to a shippable diagnostic tool." delay={0.05} />
               </div>
               <Reveal delay={0.15}>
@@ -672,7 +659,7 @@ export default function App() {
           <div className="container">
             <div className="section-head">
               <div>
-                <Reveal><p className="section-label">Selected work — 03, 04 &amp; 05</p></Reveal>
+                <Reveal><p className="section-label">Selected work 03, 04 &amp; 05</p></Reveal>
                 <SplitText as="h2" text="Current 0→1 work, a travel concept, and brand at scale." delay={0.05} />
               </div>
               <Reveal delay={0.15}>
@@ -699,13 +686,13 @@ export default function App() {
                     <div>
                       <p className="summary">
                         Leading design from discovery through high-fidelity execution for a
-                        B2C web platform — restructuring dense financial content into gamified
+                        B2C web platform, restructuring dense financial content into gamified
                         learning modules, and partnering with product and engineering to keep
                         AI-driven features shippable.
                       </p>
                       <p className="nda-note">
                         Screens aren&rsquo;t public. The process is shareable and I&rsquo;m happy
-                        to walk through the work live — just ask.
+                        to walk through the work live, just ask.
                       </p>
                       <div className="tag-row">
                         <span className="tag">0→1 product</span>
@@ -737,7 +724,10 @@ export default function App() {
                 </article>
               </Reveal>
 
-              {/* 04 — Travelogue */}
+              {/* 04 — Travelogue.
+                  TODO(Eshani): your notes marked this card's title, subtitle, and 3
+                  checklist bullets as "I will input info here" — swap the summary
+                  paragraph below for that copy once you've written it. */}
               <Reveal className="stack-item" style={{ "--i": "1" }}>
                 <article className="proj proj-wide" data-testid="project-card-travelogue">
                   <div className="proj-media" data-cursor="Travelogue">
@@ -754,8 +744,8 @@ export default function App() {
                     </div>
                     <p className="summary">
                       A self-initiated, research-led concept that consolidates trip planning into
-                      one home — upcoming trips, itineraries, documents, and the people coming
-                      along — shaped directly by traveler interviews about offline access, group
+                      one home: upcoming trips, itineraries, documents, and the people coming
+                      along, shaped directly by traveler interviews about offline access, group
                       coordination, and expense tracking.
                     </p>
                     <div className="tag-row">
@@ -781,7 +771,7 @@ export default function App() {
                     <div>
                       <p className="summary">
                         Built an AI-assisted design workflow spanning copy, mockups, and social
-                        and print assets across 25+ clients — maintaining brand standards over
+                        and print assets across 25+ clients, maintaining brand standards over
                         1,000+ assets, and designing brand pitch decks used directly in client
                         acquisition.
                       </p>
@@ -816,31 +806,65 @@ export default function App() {
           </div>
         </section>
 
-        {/* ---------- reference ---------- */}
-        <Testimonial />
-
-        {/* ---------- capabilities ---------- */}
-        <section className="section section-bright" id="capabilities">
+        {/* ---------- what I offer ---------- */}
+        <section className="section section-bright" id="offer">
           <div className="container">
             <div className="section-head">
               <div>
-                <Reveal><p className="section-label">Capabilities</p></Reveal>
-                <SplitText as="h2" text="Research, structure, and craft." testId="capabilities-heading" delay={0.05} />
+                <Reveal><p className="section-label">What I offer</p></Reveal>
+                <SplitText as="h2" text="Four disciplines, one design process." testId="offer-heading" delay={0.05} />
               </div>
               <Reveal delay={0.15}>
-                <p className="desc">
-                  The verified tools and methods behind the work above — grouped by what
-                  they're for.
-                </p>
+                <p className="desc">Expand any discipline for the detail behind it.</p>
               </Reveal>
             </div>
-            <div className="capabilities-grid">
-              {capabilities.map(([title, items], i) => (
-                <Reveal key={title} delay={i * 0.07} className="cap-card" testId={`capability-${i + 1}`}>
-                  <h3>{title}</h3>
-                  <ul>{items.map((it) => <li key={it}>{it}</li>)}</ul>
-                </Reveal>
-              ))}
+            <div className="offer-list">
+              {offerings.map(([title, items], i) => {
+                const isOpen = openOffer === i;
+                return (
+                  <div className="offer-item" key={title}>
+                    <button
+                      className="offer-head"
+                      onClick={() => setOpenOffer(isOpen ? null : i)}
+                      aria-expanded={isOpen}
+                      data-testid={`offer-toggle-${i}`}
+                    >
+                      <h3>{title}</h3>
+                      {isOpen ? <Minus size={18} /> : <Plus size={18} />}
+                    </button>
+                    <AnimatePresence initial={false}>
+                      {isOpen && (
+                        <motion.div
+                          className="offer-detail"
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.38, ease: EASE }}
+                          data-testid={`offer-detail-${i}`}
+                        >
+                          {items.length ? (
+                            <ul>{items.map((it) => <li key={it}>{it}</li>)}</ul>
+                          ) : (
+                            <p className="offer-empty">Detail coming soon.</p>
+                          )}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* ---------- design tools ---------- */}
+        <section className="section" id="tools">
+          <div className="container">
+            <div className="section-head">
+              <div>
+                <Reveal><p className="section-label">Design tools</p></Reveal>
+                <SplitText as="h2" text="What the work above was made with." testId="tools-heading" delay={0.05} />
+              </div>
             </div>
             <Reveal delay={0.15}>
               <ToolMarquee theme={theme} />
@@ -911,7 +935,7 @@ export default function App() {
                   alt="Portrait of Eshani Somwanshi, product and UX designer."
                   testId="about-image-portrait"
                 />
-                <figcaption>Eshani Somwanshi — Chicago, IL</figcaption>
+                <figcaption>Eshani Somwanshi · San Francisco, CA</figcaption>
               </figure>
             </Reveal>
             <Reveal className="about-copy" testId="about-copy">
@@ -919,64 +943,29 @@ export default function App() {
               <p>
                 Eshani Somwanshi is a product and UX designer working at the intersection of
                 research, systems thinking, and visual craft. Her work spans healthcare, AI
-                interaction design, and enterprise workflows — grounded in usability testing,
+                interaction design, and enterprise workflows, grounded in usability testing,
                 heuristic evaluation, and close collaboration with product and engineering teams.
               </p>
               <p className="muted">
                 She holds a Master of Science in Human-Computer Interaction from DePaul
                 University and a Bachelor of Design in Industrial Design from Symbiosis
                 Institute of Design. Her roles have taken her through Chicago, San Jose, and
-                Pune — from AI-companion interaction design to regulated diagnostic tooling to
+                Pune: from AI-companion interaction design to regulated diagnostic tooling to
                 0→1 gamified product experiences.
               </p>
               <dl className="about-facts">
-                <div><dt>Education</dt><dd>MS, HCI — DePaul University, 2025</dd></div>
-                <div><dt>Education</dt><dd>B.Des, Industrial Design — Symbiosis, 2022</dd></div>
-                <div><dt>Based in</dt><dd>Chicago, IL</dd></div>
-                {/* TODO(Eshani): set this to whatever is actually true for you.
-                    Common accurate phrasings: "Authorized to work in the US",
-                    "F-1 OPT — STEM extension eligible, no sponsorship needed until 2028",
-                    "US citizen". Do not leave it vague and do not overstate it. */}
-                <div><dt>Work authorization</dt><dd>Authorized to work in the US</dd></div>
+                <div>
+                  <dt>Education</dt>
+                  <dd>MS, HCI · DePaul University, 2025</dd>
+                </div>
+                {/* No <dt> here on purpose — this entry groups under the "Education" heading above it. */}
+                <div>
+                  <dt></dt>
+                  <dd>B.Des, Industrial Design · Symbiosis, 2022</dd>
+                </div>
+                <div><dt>Based in</dt><dd>San Francisco, Bay Area</dd></div>
                 <div><dt>Focus</dt><dd>Healthcare · AI · Enterprise</dd></div>
               </dl>
-            </Reveal>
-          </div>
-        </section>
-
-        {/* ---------- resume ---------- */}
-        <section className="section" id="resume">
-          <div className="container">
-            <div className="section-head">
-              <div>
-                <Reveal><p className="section-label">Resume</p></Reveal>
-                <SplitText as="h2" text="Every claim on this site, sourced." testId="resume-heading" delay={0.05} />
-              </div>
-              <Reveal delay={0.15}>
-                <p className="desc">
-                  The résumé PDF is the single source of truth behind every metric and role
-                  shown above.
-                </p>
-              </Reveal>
-            </div>
-            <Reveal>
-              <div className="resume-card" data-testid="resume-card">
-                <div>
-                  <h3>Eshani Somwanshi — Résumé</h3>
-                  <p>Opens in a new tab — education, experience, and verified skills in one PDF.</p>
-                </div>
-                <Magnetic>
-                  <a
-                    className="btn btn-primary"
-                    href={`${process.env.PUBLIC_URL}/resume/Eshani_Somwanshi_Resume.pdf`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    data-testid="resume-download-button"
-                  >
-                    View résumé <ArrowUpRight size={15} />
-                  </a>
-                </Magnetic>
-              </div>
             </Reveal>
           </div>
         </section>
@@ -997,7 +986,7 @@ export default function App() {
               </h2>
               <p className="lede">
                 I&rsquo;m open to product design roles across healthcare, AI, and enterprise
-                systems. Send a message here — or reach out directly. I reply to every one.
+                systems. Send a message here, or reach out directly. I reply to every one.
               </p>
               <div className="contact-actions">
                 <Magnetic>
@@ -1050,6 +1039,25 @@ export default function App() {
           </a>
         </div>
       </footer>
+
+      {/* Sticky back-to-top, per notes: stays on screen, bottom-right. */}
+      <AnimatePresence>
+        {showTop && (
+          <motion.button
+            type="button"
+            className="back-to-top"
+            onClick={() => go("top")}
+            aria-label="Back to top"
+            data-testid="back-to-top-button"
+            initial={{ opacity: 0, y: 12, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 12, scale: 0.9 }}
+            transition={{ duration: 0.28, ease: EASE }}
+          >
+            <ArrowUp size={18} />
+          </motion.button>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
