@@ -1059,6 +1059,8 @@ figcaption {
 .case-highlights { display: flex; flex-direction: column; gap: .7rem; margin-top: 1.6rem; }
 .case-highlights li { display: flex; align-items: flex-start; gap: .6rem; font-size: .88rem; line-height: 1.5; color: var(--muted); }
 .case-highlights svg { flex: none; margin-top: .2rem; color: var(--accent-strong); }
+.case-cover-preview { margin: 2.2rem 0 1.8rem; border: 1px solid var(--line); overflow: hidden; }
+.case-cover-preview .wipe { aspect-ratio: 16 / 10; }
 
 /* ---------- about ---------- */
 .about-grid { display: grid; grid-template-columns: .72fr 1.28fr; gap: clamp(2rem, 4vw, 3.5rem); align-items: start; }

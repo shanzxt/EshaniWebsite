@@ -458,8 +458,11 @@
 
 .rcard-inner img {
   display: block;
-  width: 100%;
+  width: auto;
+  max-width: 100%;
   height: auto;
+  max-height: 620px;
+  margin: 0 auto;
 }
 
 .rcard-shadow {

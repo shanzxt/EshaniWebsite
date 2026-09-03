@@ -26,7 +26,6 @@ import "./App.css";
 import Preloader from "./components/site/Preloader";
 import AvatarHero from "./components/ui/AvatarHero";
 import MacBookScroll from "./components/devices/MacBookScroll";
-import PhoneFrame from "./components/devices/PhoneFrame";
 
 /* ========================================================================
    Content
@@ -239,6 +238,13 @@ function CaseStudy({ go }) {
             <li><Check size={15} /> Compressed MVP delivery timeline by 3 weeks through rapid prototyping and usability validation.</li>
             <li><Check size={15} /> Enabled clinicians to streamline diagnostic tasks 20% quicker while maintaining regulatory compliance.</li>
           </ul>
+          <figure className="case-cover-preview">
+            <Wipe
+              src={IMG("eyeai-cover.png")}
+              alt="Eye AI product site: onboarding clinicians to the diagnostic platform"
+              testId="case-onward-cover"
+            />
+          </figure>
           <nav className="chapter-nav" aria-label="Case study chapters">
             <ul>
               {chapters.map(([id, n, label]) => (
@@ -731,11 +737,11 @@ export default function App() {
               <Reveal className="stack-item" style={{ "--i": "1" }}>
                 <article className="proj proj-wide" data-testid="project-card-travelogue">
                   <div className="proj-media" data-cursor="Travelogue">
-                    <div className="ph-trio">
-                      <PhoneFrame src={IMG("travelogue-home.png")} alt="Travelogue home feed" delay={0} />
-                      <PhoneFrame src={IMG("travelogue-trip.png")} alt="Travelogue trip hub" delay={0.8} />
-                      <PhoneFrame src={IMG("travelogue-feed.png")} alt="Travelogue photo feed" delay={1.6} />
-                    </div>
+                    <Wipe
+                      src={IMG("travelogue-cover.png")}
+                      alt="Travelogue home feed and a group trip hub shown side by side on two phones."
+                      testId="project-image-travelogue"
+                    />
                   </div>
                   <div className="proj-body">
                     <div>
