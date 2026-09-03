@@ -31,9 +31,15 @@ export default function Assemble({
   const ref = useRef(null);
   const reduced = useReducedMotion();
 
+  // Resolved against the block's own top, not its center — a tall multi-row
+  // grid used to need its vertical center to reach mid-viewport before the
+  // last child cleared, which meant the top rows sat blurred long after they
+  // scrolled into view. Finishing off the top edge instead means everything
+  // is settled and sharp shortly after the block appears, regardless of how
+  // tall it is.
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: ["start 0.95", "center 0.55"],
+    offset: ["start 0.95", "start 0.4"],
   });
   const p = useSpring(scrollYProgress, {
     stiffness: 68,

@@ -89,17 +89,17 @@ const tools = [
    more of the actual work visible without a click-through, Brandon Lee
    Designs-style. Rendered as CSS-column masonry so each image keeps its
    native aspect ratio instead of being cropped into a uniform tile.
-   eyeai-dashboard.png is a lower-res, drop-shadowed crop of this same
-   screen — eyeai-cover.png is the clean, full-resolution version, so that's
-   what belongs here. myocircle-profile.png was dropped: its 3-phone
-   composite is nearly 2.5x taller than everything else and dominated the
-   grid awkwardly. */
+   myocircle-profile.png was dropped: its 3-phone composite is nearly 2.5x
+   taller than everything else and dominated the grid awkwardly.
+   myocircle-level13.png has the same problem (a single 700x2083 phone
+   composite) but earns its spot on content, so it's capped with the "tall"
+   flag below instead of being cut entirely — see .shot--tall in App.css. */
 const shots = [
-  ["eyeai-cover.png", "EYE AI clinician dashboard listing patients, images analyzed, and diagnostic status.", "Onward Technologies · EYE AI", "Clinician dashboard: patients and diagnostic queue"],
+  ["onward-1.png", "Onward's EYE AI product site hero: “Enhance your practice with AI technology.”", "Onward Technologies · EYE AI", "The site clinicians land on first"],
   ["myocircle-interaction.png", "MyoCircle exercise screen with Zoe's congratulations card after a completed exercise, awarding points.", "OptraHealth · MyoCircle", "Zoe's encouragement moment, mid-exercise"],
   ["travelogue-tripdetail.png", "Travelogue trip detail screen with people, map locations, and an itinerary hub.", "Travelogue", "One trip: people, places, and itinerary in one hub"],
   ["myocircle-day1.png", "MyoCircle Day 1 exercise screen with a guided video, sets and reps tracking, and a Start Exercise button.", "OptraHealth · MyoCircle", "Where a session starts"],
-  ["myocircle-level13.png", "MyoCircle workout progress screen showing Level 13, 25% progress, and the Day 1 exercise video queue.", "OptraHealth · MyoCircle", "Progress and the exercise queue"],
+  ["myocircle-level13.png", "MyoCircle workout progress screen showing Level 13, 25% progress, and the Day 1 exercise video queue.", "OptraHealth · MyoCircle", "Progress and the exercise queue", true],
 ];
 
 const navItems = [
@@ -258,7 +258,7 @@ function CaseStudy({ go }) {
           </ul>
           <figure className="case-cover-preview">
             <Wipe
-              src={IMG("eyeai-cover.png")}
+              src={IMG("onward-1.png")}
               alt="Eye AI product site: onboarding clinicians to the diagnostic platform"
               testId="case-onward-cover"
             />
@@ -696,8 +696,8 @@ export default function App() {
                 motion, so a second clip-path reveal on top of it would just
                 fight the fly-in. */}
             <Assemble className="shot-grid" spread={220} swirl={10} stagger={0.3}>
-              {shots.map(([src, alt, tag, cap], i) => (
-                <figure className="shot" data-testid={`gallery-shot-${i}`} key={src}>
+              {shots.map(([src, alt, tag, cap, tall], i) => (
+                <figure className={`shot${tall ? " shot--tall" : ""}`} data-testid={`gallery-shot-${i}`} key={src}>
                   <div className="wipe">
                     <img
                       src={IMG(src)}

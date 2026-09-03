@@ -1,73 +1,39 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion, useSpring, useMotionValue, useTransform, useReducedMotion } from "framer-motion";
+import { IMG } from "../../primitives";
 
 /**
- * InteractiveAvatar — Elegant Bun Hairstyle with Two Face-Framing Strands
+ * InteractiveAvatar — a real portrait, not an illustration.
  *
- * Design:
- *  - Classic, chic hair bun at the crown/back
- *  - Smooth swept-back hairline framing the forehead
- *  - Two delicate wavy tendrils/strands falling gracefully in front past cheeks to shoulders
- *  - Prominent sparkling silver jhumkas dangling with reactive physics
- *  - Real-time cursor tracking eyes & natural blinking
+ * The hand-drawn cartoon this used to render read as amateur next to the
+ * rest of the site's editorial photography (about section, case studies).
+ * This swaps it for the same portrait used in About, framed as a duotone
+ * arch cut-out that echoes the hero's organic cloud shapes, with a light
+ * mouse-tilt parallax and a click-triggered speech bubble kept for
+ * personality.
  */
 export default function InteractiveAvatar({
   className = "",
   size = 460,
   interactive = true,
-  theme = "paper"
+  theme = "paper",
 }) {
   const containerRef = useRef(null);
-  const leftEyeRef = useRef(null);
-  const rightEyeRef = useRef(null);
   const reduced = useReducedMotion();
 
-  const [isBlinking, setIsBlinking] = useState(false);
-  const [isWinking, setIsWinking] = useState(false);
   const [isHappy, setIsHappy] = useState(false);
   const [speechBubble, setSpeechBubble] = useState("");
 
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
-
   const spring = { stiffness: 90, damping: 18, mass: 0.5 };
   const smoothX = useSpring(mouseX, spring);
   const smoothY = useSpring(mouseY, spring);
 
-  // Subtle Head Parallax
-  const headRotateY = useTransform(smoothX, [-1, 1], [-5, 5]);
-  const headRotateX = useTransform(smoothY, [-1, 1], [3.5, -3.5]);
-  const headX = useTransform(smoothX, [-1, 1], [-5, 5]);
-  const headY = useTransform(smoothY, [-1, 1], [-3.5, 3.5]);
-
-  // Bun and Tendril Strand Parallax
-  const bunX = useTransform(smoothX, [-1, 1], [2.5, -2.5]);
-  const tendrilX = useTransform(smoothX, [-1, 1], [-6, 6]);
-
-  // Jhumka Reactive Physics
-  const earringLeftRotate = useTransform(smoothX, [-1, 1], [-8, 12]);
-  const earringRightRotate = useTransform(smoothX, [-1, 1], [-12, 8]);
-  const browY = useTransform(smoothY, [-1, 1], [-2, 1.2]);
-
-  const [leftPupil, setLeftPupil] = useState({ x: 0, y: 0 });
-  const [rightPupil, setRightPupil] = useState({ x: 0, y: 0 });
-
-  const updatePupils = useCallback((clientX, clientY) => {
-    if (!leftEyeRef.current || !rightEyeRef.current) return;
-
-    const calcEye = (rect, maxRadius) => {
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
-      const dx = clientX - cx;
-      const dy = clientY - cy;
-      const angle = Math.atan2(dy, dx);
-      const radius = Math.min(maxRadius, Math.hypot(dx, dy) / 30);
-      return { x: Math.cos(angle) * radius, y: Math.sin(angle) * radius * 0.7 };
-    };
-
-    setLeftPupil(calcEye(leftEyeRef.current.getBoundingClientRect(), 4.6));
-    setRightPupil(calcEye(rightEyeRef.current.getBoundingClientRect(), 4.6));
-  }, []);
+  const rotateY = useTransform(smoothX, [-1, 1], [-6, 6]);
+  const rotateX = useTransform(smoothY, [-1, 1], [4, -4]);
+  const shiftX = useTransform(smoothX, [-1, 1], [-6, 6]);
+  const shiftY = useTransform(smoothY, [-1, 1], [-4, 4]);
 
   useEffect(() => {
     if (!interactive || reduced) return;
@@ -82,7 +48,6 @@ export default function InteractiveAvatar({
         const cy = window.innerHeight / 2;
         mouseX.set(Math.max(-1, Math.min(1, (e.clientX - cx) / cx)));
         mouseY.set(Math.max(-1, Math.min(1, (e.clientY - cy) / cy)));
-        updatePupils(e.clientX, e.clientY);
       });
     };
 
@@ -97,14 +62,8 @@ export default function InteractiveAvatar({
     const idle = setInterval(() => {
       if (Date.now() - lastMove < 4000) return;
       const t = Date.now() / 1600;
-      const ax = Math.sin(t) * 0.3;
-      const ay = Math.cos(t * 0.7) * 0.18;
-      mouseX.set(ax);
-      mouseY.set(ay);
-      if (containerRef.current) {
-        const r = containerRef.current.getBoundingClientRect();
-        updatePupils(r.left + r.width / 2 + ax * 260, r.top + r.height / 2 + ay * 180);
-      }
+      mouseX.set(Math.sin(t) * 0.3);
+      mouseY.set(Math.cos(t * 0.7) * 0.18);
     }, 120);
 
     window.addEventListener("mousemove", onMove, { passive: true });
@@ -116,44 +75,22 @@ export default function InteractiveAvatar({
       if (rafId) cancelAnimationFrame(rafId);
       clearInterval(idle);
     };
-  }, [interactive, reduced, mouseX, mouseY, updatePupils]);
-
-  useEffect(() => {
-    let timer;
-    const blink = () => {
-      setIsBlinking(true);
-      setTimeout(() => {
-        setIsBlinking(false);
-        if (Math.random() < 0.22) {
-          setTimeout(() => {
-            setIsBlinking(true);
-            setTimeout(() => setIsBlinking(false), 120);
-          }, 180);
-        }
-      }, 140);
-      timer = setTimeout(blink, 3400 + Math.random() * 3600);
-    };
-    timer = setTimeout(blink, 2800);
-    return () => clearTimeout(timer);
-  }, []);
+  }, [interactive, reduced, mouseX, mouseY]);
 
   const handleClick = () => {
-    setIsWinking(true);
     setIsHappy(true);
     const lines = [
       "Hi there! 👋",
       "Welcome to my portfolio! ✨",
       "Designing with clarity & craft 💡",
-      "Let's build something great 🚀"
+      "Let's build something great 🚀",
     ];
     setSpeechBubble(lines[Math.floor(Math.random() * lines.length)]);
     setTimeout(() => {
-      setIsWinking(false);
+      setIsHappy(false);
       setTimeout(() => setSpeechBubble(""), 2600);
-    }, 600);
+    }, 900);
   };
-
-  const eyesClosed = isBlinking || isWinking;
 
   return (
     <div
@@ -166,16 +103,14 @@ export default function InteractiveAvatar({
         position: "relative",
         width: "100%",
         maxWidth: `${size}px`,
-        aspectRatio: "440 / 520",
         margin: "0 auto",
         cursor: "pointer",
         userSelect: "none",
-        perspective: "1100px"
+        perspective: "1100px",
       }}
       title="Click me!"
       data-testid="interactive-avatar"
     >
-      {/* Speech bubble */}
       {speechBubble && (
         <motion.div
           initial={{ opacity: 0, y: 10, scale: 0.9 }}
@@ -198,7 +133,7 @@ export default function InteractiveAvatar({
             border: "1px solid var(--line, #E5E7EB)",
             zIndex: 30,
             whiteSpace: "nowrap",
-            pointerEvents: "none"
+            pointerEvents: "none",
           }}
         >
           {speechBubble}
@@ -212,508 +147,42 @@ export default function InteractiveAvatar({
               height: "12px",
               background: "var(--card, #FFFFFF)",
               borderRight: "1px solid var(--line, #E5E7EB)",
-              borderBottom: "1px solid var(--line, #E5E7EB)"
+              borderBottom: "1px solid var(--line, #E5E7EB)",
             }}
           />
         </motion.div>
       )}
 
-      <motion.svg
-        viewBox="0 0 440 520"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
+      <motion.div
+        className="avatar-arch-frame"
         animate={reduced ? undefined : { y: [0, -6, 0] }}
         transition={{ duration: 6.5, repeat: Infinity, ease: "easeInOut" }}
-        style={{
-          width: "100%",
-          height: "100%",
-          overflow: "visible",
-          filter: "drop-shadow(0 22px 44px rgba(24,16,10,0.16))"
-        }}
+        style={{ transformStyle: "preserve-3d" }}
       >
-        <defs>
-          {/* Continuous Gradients */}
-          <linearGradient id="ia-skin" gradientUnits="userSpaceOnUse" x1="220" y1="120" x2="220" y2="310">
-            <stop offset="0%" stopColor="#F8D6B8" />
-            <stop offset="60%" stopColor="#EEC099" />
-            <stop offset="100%" stopColor="#E0A87E" />
-          </linearGradient>
-          <linearGradient id="ia-neck" gradientUnits="userSpaceOnUse" x1="220" y1="260" x2="220" y2="370">
-            <stop offset="0%" stopColor="#D2946C" />
-            <stop offset="50%" stopColor="#E4B189" />
-            <stop offset="100%" stopColor="#EEC099" />
-          </linearGradient>
-          <radialGradient id="ia-blush" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#EE8264" stopOpacity="0.35" />
-            <stop offset="100%" stopColor="#EE8264" stopOpacity="0" />
-          </radialGradient>
-          <radialGradient id="ia-glow" cx="50%" cy="42%" r="58%">
-            <stop offset="0%" stopColor="#FFE7C4" stopOpacity="0.45" />
-            <stop offset="100%" stopColor="#FFE7C4" stopOpacity="0" />
-          </radialGradient>
-
-          {/* Hair Bun & Strands Gradients */}
-          <linearGradient id="ia-bun" gradientUnits="userSpaceOnUse" x1="160" y1="20" x2="280" y2="120">
-            <stop offset="0%" stopColor="#32343F" />
-            <stop offset="50%" stopColor="#22242D" />
-            <stop offset="100%" stopColor="#14151B" />
-          </linearGradient>
-          <linearGradient id="ia-hairFront" gradientUnits="userSpaceOnUse" x1="120" y1="70" x2="330" y2="430">
-            <stop offset="0%" stopColor="#353742" />
-            <stop offset="55%" stopColor="#22242D" />
-            <stop offset="100%" stopColor="#15161D" />
-          </linearGradient>
-          <linearGradient id="ia-hairLite" gradientUnits="userSpaceOnUse" x1="220" y1="40" x2="220" y2="380">
-            <stop offset="0%" stopColor="#585D70" stopOpacity="0.85" />
-            <stop offset="100%" stopColor="#2A2C36" stopOpacity="0" />
-          </linearGradient>
-
-          {/* Eye Gradients */}
-          <radialGradient id="ia-iris" cx="38%" cy="34%" r="66%">
-            <stop offset="0%" stopColor="#8A4C22" />
-            <stop offset="58%" stopColor="#4A2409" />
-            <stop offset="100%" stopColor="#1C0E04" />
-          </radialGradient>
-          <linearGradient id="ia-lid" gradientUnits="userSpaceOnUse" x1="220" y1="193" x2="220" y2="222">
-            <stop offset="0%" stopColor="#2A1608" stopOpacity="0.22" />
-            <stop offset="100%" stopColor="#2A1608" stopOpacity="0" />
-          </linearGradient>
-
-          {/* Jewelry & Kurta Gradients */}
-          <linearGradient id="ia-silver" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#FFFFFF" />
-            <stop offset="45%" stopColor="#DCE1EA" />
-            <stop offset="100%" stopColor="#98A0B0" />
-          </linearGradient>
-          <radialGradient id="ia-bindi" cx="34%" cy="32%" r="70%">
-            <stop offset="0%" stopColor="#FFE08A" />
-            <stop offset="60%" stopColor="#EFA02F" />
-            <stop offset="100%" stopColor="#B2650E" />
-          </radialGradient>
-          <linearGradient id="ia-kurta" gradientUnits="userSpaceOnUse" x1="220" y1="354" x2="220" y2="520">
-            <stop offset="0%" stopColor="#FFFFFF" />
-            <stop offset="80%" stopColor="#F4F5F8" />
-            <stop offset="100%" stopColor="#E4E7ED" />
-          </linearGradient>
-
-          {/* Eye ClipPaths */}
-          <clipPath id="ia-clipL">
-            <path d="M166 209 C170 195 202 195 206 209 C204 224 168 224 166 209 Z" />
-          </clipPath>
-          <clipPath id="ia-clipR">
-            <path d="M234 209 C238 195 270 195 274 209 C272 224 236 224 234 209 Z" />
-          </clipPath>
-        </defs>
-
-        {/* ---------- LAYER 1 — TOP/BACK HAIR BUN ---------- */}
-        <motion.g style={reduced ? {} : { x: bunX }}>
-          <ellipse cx="220" cy="62" rx="52" ry="42" fill="url(#ia-bun)" />
-          <path
-            d="M178 72 C178 38 262 38 262 72 C262 86 178 86 178 72 Z"
-            fill="url(#ia-bun)"
-          />
-          <path
-            d="M185 58 C198 42 242 42 255 58"
-            stroke="url(#ia-hairLite)"
-            strokeWidth="3.5"
-            strokeLinecap="round"
-            fill="none"
-            opacity="0.6"
-          />
-          <path
-            d="M194 70 C206 58 234 58 246 70"
-            stroke="url(#ia-hairLite)"
-            strokeWidth="2.8"
-            strokeLinecap="round"
-            fill="none"
-            opacity="0.5"
-          />
-        </motion.g>
-
-        {/* ---------- LAYER 2 — NECK, SHOULDERS, KURTA ---------- */}
-        <g id="ia-body">
-          <path
-            d="M194 258 L180 360 C194 374 246 374 260 360 L246 258 Z"
-            fill="url(#ia-neck)"
-          />
-          <path d="M192 270 C204 295 236 295 248 270 C242 298 198 298 192 270 Z" fill="#A9673C" opacity="0.38" />
-
-          <path
-            d="M60 520 C68 446 104 398 158 378 C176 371 190 365 196 354 L244 354 C250 365 264 371 282 378 C336 398 372 446 380 520 Z"
-            fill="url(#ia-kurta)"
-          />
-          <path d="M60 520 C68 452 98 408 146 386 C126 424 116 470 112 520 Z" fill="#C9CFDC" opacity="0.22" />
-          <path d="M380 520 C372 452 342 408 294 386 C314 424 324 470 328 520 Z" fill="#C9CFDC" opacity="0.22" />
-
-          <path d="M192 356 C202 386 212 408 220 416 C228 408 238 386 248 356 Z" fill="url(#ia-neck)" />
-
-          <path
-            d="M188 358 C196 388 208 410 220 422 C232 410 244 388 252 358"
-            stroke="#FFFFFF"
-            strokeWidth="7"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            fill="none"
-          />
-          <path
-            d="M184 356 C193 390 206 414 220 428 C234 414 247 390 256 356"
-            stroke="#D9DEE8"
-            strokeWidth="1.6"
-            strokeDasharray="4 3.5"
-            fill="none"
-          />
-
-          <path
-            d="M200 358 C206 376 213 388 220 395 C227 388 234 376 240 358"
-            stroke="url(#ia-silver)"
-            strokeWidth="2"
-            strokeLinecap="round"
-            fill="none"
-          />
-          <circle cx="220" cy="397" r="3.6" fill="#3B6FD4" stroke="#FFFFFF" strokeWidth="1.2" />
-        </g>
-
-        {/* ---------- LAYER 3 — HEAD, FEATURES, EYES ---------- */}
-        <motion.g
-          id="ia-head"
+        <motion.div
+          className={`avatar-arch-tilt${isHappy ? " is-happy" : ""}`}
           style={
             reduced
               ? {}
               : {
-                  rotateY: headRotateY,
-                  rotateX: headRotateX,
-                  x: headX,
-                  y: headY,
-                  transformOrigin: "220px 270px"
+                  rotateX,
+                  rotateY,
+                  x: shiftX,
+                  y: shiftY,
                 }
           }
         >
-          {/* Ears */}
-          <path d="M150 208 C138 206 133 220 137 234 C140 244 147 250 153 248 Z" fill="url(#ia-skin)" />
-          <path
-            d="M146 218 C141 222 141 234 147 238"
-            stroke="#CE8259"
-            strokeWidth="2.2"
-            strokeLinecap="round"
-            fill="none"
+          <img
+            src={IMG("profile.png")}
+            alt="Eshani Somwanshi, product and UX designer"
+            className="avatar-photo"
+            loading="eager"
+            decoding="async"
           />
-          <path d="M290 208 C302 206 307 220 303 234 C300 244 293 250 287 248 Z" fill="url(#ia-skin)" />
-          <path
-            d="M294 218 C299 222 299 234 293 238"
-            stroke="#CE8259"
-            strokeWidth="2.2"
-            strokeLinecap="round"
-            fill="none"
-          />
-
-          {/* Symmetrical Face Oval */}
-          <path
-            d="M168 152 
-               C152 185 149 220 153 250 
-               C160 276 186 298 220 304 
-               C254 298 280 276 287 250 
-               C291 220 288 185 272 152 
-               C254 138 238 135 220 135 
-               C202 135 186 138 168 152 Z"
-            fill="url(#ia-skin)"
-          />
-          <ellipse cx="220" cy="176" rx="50" ry="38" fill="url(#ia-glow)" />
-          <ellipse cx="178" cy="236" rx="19" ry="12" fill="url(#ia-blush)" />
-          <ellipse cx="262" cy="236" rx="19" ry="12" fill="url(#ia-blush)" />
-
-          {/* Golden Bindi */}
-          <circle cx="220" cy="166" r="4" fill="url(#ia-bindi)" />
-          <circle cx="218.8" cy="164.8" r="1.1" fill="#FFF3D0" opacity="0.9" />
-
-          {/* Eyebrows */}
-          <motion.g style={reduced ? {} : { y: browY }}>
-            <path
-              d="M167 187 C176 176 199 174 209 182"
-              stroke="#1A1B22"
-              strokeWidth="5"
-              strokeLinecap="round"
-              fill="none"
-            />
-            <path
-              d="M273 187 C264 176 241 174 231 182"
-              stroke="#1A1B22"
-              strokeWidth="5"
-              strokeLinecap="round"
-              fill="none"
-            />
-          </motion.g>
-
-          {/* Eyes */}
-          <g id="ia-eyes">
-            {/* Left Eye */}
-            <g ref={leftEyeRef}>
-              <path d="M166 209 C170 195 202 195 206 209 C204 224 168 224 166 209 Z" fill="#FDFCFA" />
-              <path d="M166 209 C170 195 202 195 206 209 C202 202 170 202 166 209 Z" fill="url(#ia-lid)" />
-              <g clipPath="url(#ia-clipL)">
-                <g transform={`translate(${leftPupil.x}, ${leftPupil.y})`}>
-                  <circle cx="186" cy="209" r="10.6" fill="url(#ia-iris)" />
-                  <circle cx="186" cy="209" r="10.6" fill="none" stroke="#170A02" strokeWidth="1.3" />
-                  <circle cx="186" cy="209" r="5.2" fill="#0B0501" />
-                  <circle cx="183" cy="205" r="2.8" fill="#FFFFFF" opacity="0.95" />
-                  <circle cx="189.5" cy="212.5" r="1.3" fill="#FFFFFF" opacity="0.6" />
-                </g>
-              </g>
-              <path
-                d="M165 208 C171 193 201 193 207 208"
-                stroke="#16171D"
-                strokeWidth="3.4"
-                strokeLinecap="round"
-                fill="none"
-              />
-              <path
-                d="M165.5 209 C161 210 158.5 209 157 206"
-                stroke="#16171D"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-                fill="none"
-              />
-              <path
-                d="M170 219 C178 223 194 223 202 218"
-                stroke="#C98D64"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                fill="none"
-                opacity="0.8"
-              />
-              {eyesClosed && (
-                <>
-                  <ellipse cx="187" cy="211" rx="24" ry="18" fill="url(#ia-skin)" />
-                  <path
-                    d="M165 205 C171 220 201 220 207 205"
-                    stroke="#16171D"
-                    strokeWidth="3.2"
-                    strokeLinecap="round"
-                    fill="none"
-                  />
-                  <path
-                    d="M165.5 206 C161 207 158.5 206 157 203"
-                    stroke="#16171D"
-                    strokeWidth="2.2"
-                    strokeLinecap="round"
-                    fill="none"
-                  />
-                </>
-              )}
-            </g>
-
-            {/* Right Eye */}
-            <g ref={rightEyeRef}>
-              <path d="M234 209 C238 195 270 195 274 209 C272 224 236 224 234 209 Z" fill="#FDFCFA" />
-              <path d="M234 209 C238 195 270 195 274 209 C270 202 238 202 234 209 Z" fill="url(#ia-lid)" />
-              <g clipPath="url(#ia-clipR)">
-                <g transform={`translate(${rightPupil.x}, ${rightPupil.y})`}>
-                  <circle cx="254" cy="209" r="10.6" fill="url(#ia-iris)" />
-                  <circle cx="254" cy="209" r="10.6" fill="none" stroke="#170A02" strokeWidth="1.3" />
-                  <circle cx="254" cy="209" r="5.2" fill="#0B0501" />
-                  <circle cx="251" cy="205" r="2.8" fill="#FFFFFF" opacity="0.95" />
-                  <circle cx="256.5" cy="212.5" r="1.3" fill="#FFFFFF" opacity="0.6" />
-                </g>
-              </g>
-              <path
-                d="M233 208 C239 193 269 193 275 208"
-                stroke="#16171D"
-                strokeWidth="3.4"
-                strokeLinecap="round"
-                fill="none"
-              />
-              <path
-                d="M274.5 209 C279 210 281.5 209 283 206"
-                stroke="#16171D"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-                fill="none"
-              />
-              <path
-                d="M238 218 C246 223 262 223 270 219"
-                stroke="#C98D64"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                fill="none"
-                opacity="0.8"
-              />
-              {isBlinking && !isWinking && (
-                <>
-                  <ellipse cx="253" cy="211" rx="24" ry="18" fill="url(#ia-skin)" />
-                  <path
-                    d="M233 205 C239 220 269 220 275 205"
-                    stroke="#16171D"
-                    strokeWidth="3.2"
-                    strokeLinecap="round"
-                    fill="none"
-                  />
-                  <path
-                    d="M274.5 206 C279 207 281.5 206 283 203"
-                    stroke="#16171D"
-                    strokeWidth="2.2"
-                    strokeLinecap="round"
-                    fill="none"
-                  />
-                </>
-              )}
-            </g>
-          </g>
-
-          {/* Nose */}
-          <g id="ia-nose">
-            <path
-              d="M221 224 C218 234 216 241 217 245"
-              stroke="#D89B72"
-              strokeWidth="2"
-              strokeLinecap="round"
-              fill="none"
-              opacity="0.55"
-            />
-            <ellipse cx="220" cy="248" rx="8" ry="4.5" fill="#E39A6C" opacity="0.28" />
-            <path
-              d="M212 250 C215 254 225 254 228 250"
-              stroke="#B4703F"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              fill="none"
-            />
-          </g>
-
-          {/* Mouth */}
-          <g id="ia-mouth">
-            {isHappy ? (
-              <>
-                <path d="M201 266 C209 282 231 282 239 266 Z" fill="#8E2C1C" />
-                <path d="M204 267 C211 273 229 273 236 267 Z" fill="#FFFFFF" />
-                <path
-                  d="M199 265 C209 269 231 269 241 265"
-                  stroke="#A8442A"
-                  strokeWidth="2.6"
-                  strokeLinecap="round"
-                  fill="none"
-                />
-              </>
-            ) : (
-              <>
-                <path
-                  d="M203 268 C210 279 230 279 237 268"
-                  stroke="#A8442A"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  fill="none"
-                />
-                <path
-                  d="M208 274 C213 278 227 278 232 274"
-                  stroke="#E08163"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                  fill="none"
-                  opacity="0.8"
-                />
-              </>
-            )}
-          </g>
-        </motion.g>
-
-        {/* ---------- LAYER 4 — SWEPT-BACK CROWN + TWO STRANDS COMING FORWARD ---------- */}
-        <motion.g style={reduced ? {} : { x: tendrilX }}>
-          {/* Swept-Back Front Hair Crown Framing Face */}
-          <path
-            d="M148 192 
-               C140 110 172 72 220 72 
-               C268 72 300 110 292 192 
-               C278 152 254 135 220 135 
-               C186 135 162 152 148 192 Z"
-            fill="url(#ia-hairFront)"
-          />
-
-          {/* Hairline Sleek Flow Strokes */}
-          <path
-            d="M162 142 C180 110 205 88 220 85"
-            stroke="url(#ia-hairLite)"
-            strokeWidth="3"
-            strokeLinecap="round"
-            fill="none"
-            opacity="0.55"
-          />
-          <path
-            d="M278 142 C260 110 235 88 220 85"
-            stroke="url(#ia-hairLite)"
-            strokeWidth="3"
-            strokeLinecap="round"
-            fill="none"
-            opacity="0.55"
-          />
-
-          {/* =========================================================
-              TWO ELEGANT FACE-FRAMING CURLY/WAVY STRANDS
-              ========================================================= */}
-
-          {/* --- LEFT STRAND --- */}
-          <path
-            d="M174 138 
-               C160 170 152 220 158 270 
-               C164 315 152 355 146 385 
-               C144 394 154 396 157 388 
-               C166 358 174 318 168 270 
-               C162 225 170 175 182 142 Z"
-            fill="url(#ia-hairFront)"
-          />
-          <path
-            d="M176 150 C162 190 158 245 164 295 C168 335 158 365 152 385"
-            stroke="url(#ia-hairLite)"
-            strokeWidth="2.4"
-            strokeLinecap="round"
-            fill="none"
-            opacity="0.65"
-          />
-
-          {/* --- RIGHT STRAND --- */}
-          <path
-            d="M266 138 
-               C280 170 288 220 282 270 
-               C276 315 288 355 294 385 
-               C296 394 286 396 283 388 
-               C274 358 266 318 272 270 
-               C278 225 270 175 258 142 Z"
-            fill="url(#ia-hairFront)"
-          />
-          <path
-            d="M264 150 C278 190 282 245 276 295 C272 335 282 365 288 385"
-            stroke="url(#ia-hairLite)"
-            strokeWidth="2.4"
-            strokeLinecap="round"
-            fill="none"
-            opacity="0.65"
-          />
-        </motion.g>
-
-        {/* ---------- LAYER 5 — JHUMKAS ---------- */}
-        <g id="ia-jhumkas">
-          <motion.g style={reduced ? {} : { rotate: earringLeftRotate, transformOrigin: "152px 252px" }}>
-            <circle cx="152" cy="252" r="3.4" fill="url(#ia-silver)" stroke="#5F6675" strokeWidth="0.7" />
-            <line x1="152" y1="255" x2="152" y2="261" stroke="#98A0B0" strokeWidth="1.8" />
-            <path d="M141 272 C141 261 163 261 163 272 Z" fill="url(#ia-silver)" stroke="#5F6675" strokeWidth="0.9" />
-            <line x1="140" y1="272" x2="164" y2="272" stroke="#414A59" strokeWidth="1.8" />
-            <circle cx="143" cy="276.5" r="1.4" fill="#FFF" stroke="#98A0B0" strokeWidth="0.5" />
-            <circle cx="147.5" cy="277.5" r="1.4" fill="#FFF" stroke="#98A0B0" strokeWidth="0.5" />
-            <circle cx="152" cy="278" r="1.4" fill="#FFF" stroke="#98A0B0" strokeWidth="0.5" />
-            <circle cx="156.5" cy="277.5" r="1.4" fill="#FFF" stroke="#98A0B0" strokeWidth="0.5" />
-            <circle cx="161" cy="276.5" r="1.4" fill="#FFF" stroke="#98A0B0" strokeWidth="0.5" />
-          </motion.g>
-
-          <motion.g style={reduced ? {} : { rotate: earringRightRotate, transformOrigin: "288px 252px" }}>
-            <circle cx="288" cy="252" r="3.4" fill="url(#ia-silver)" stroke="#5F6675" strokeWidth="0.7" />
-            <line x1="288" y1="255" x2="288" y2="261" stroke="#98A0B0" strokeWidth="1.8" />
-            <path d="M277 272 C277 261 299 261 299 272 Z" fill="url(#ia-silver)" stroke="#5F6675" strokeWidth="0.9" />
-            <line x1="276" y1="272" x2="300" y2="272" stroke="#414A59" strokeWidth="1.8" />
-            <circle cx="279" cy="276.5" r="1.4" fill="#FFF" stroke="#98A0B0" strokeWidth="0.5" />
-            <circle cx="283.5" cy="277.5" r="1.4" fill="#FFF" stroke="#98A0B0" strokeWidth="0.5" />
-            <circle cx="288" cy="278" r="1.4" fill="#FFF" stroke="#98A0B0" strokeWidth="0.5" />
-            <circle cx="292.5" cy="277.5" r="1.4" fill="#FFF" stroke="#98A0B0" strokeWidth="0.5" />
-            <circle cx="297" cy="276.5" r="1.4" fill="#FFF" stroke="#98A0B0" strokeWidth="0.5" />
-          </motion.g>
-        </g>
-      </motion.svg>
+          <span className="avatar-arch-duotone" aria-hidden="true" />
+          <span className="avatar-arch-sheen" aria-hidden="true" />
+        </motion.div>
+      </motion.div>
     </div>
   );
 }
