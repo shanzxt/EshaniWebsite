@@ -305,8 +305,8 @@ function CaseStudy({ go }) {
           <div className="chapter-art">
             <MacBookScroll
               src={IMG("eyeai-cover.png")}
-              alt="Eye AI product site introducing AI-assisted diagnostic technology for clinicians."
-              caption="Product site: onboarding clinicians to the platform"
+              alt="Eye AI clinician dashboard listing patients with diagnostic status and images analyzed."
+              caption="Patient dashboard: status and diagnostic queue at a glance"
               testId="case-image-cover"
             />
           </div>
@@ -586,7 +586,7 @@ export default function App() {
                 <div className="lead-media" data-cursor="MyoCircle">
                   <Wipe
                     src={IMG("myocircle-cover.png")}
-                    alt="MyoCircle mobile app across three phones, an AI-companion health app with a gamified breathe, sleep and grow theme."
+                    alt="MyoCircle mobile app across two phones, an AI-companion health app with achievement badges and a gamified exercise flow."
                     testId="project-image-myocircle"
                   />
                 </div>

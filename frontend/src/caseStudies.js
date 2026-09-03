@@ -32,7 +32,7 @@ export const caseStudies = [
                        "Legacy workflow", "Redesigned",
                        "Patient queue: six steps down to two"], */
       { label: "Interface", title: "The clinician's four minutes.", skim: "Patient queue to signed diagnostic report in minutes: 20% faster, still compliant.", body: "The final workflow lets clinicians move from patient queue to diagnostic report in minutes: a clear patient table with status at a glance, guided upload and analysis, and automated reporting that holds up in a regulated environment, enabling diagnostic tasks to be completed 20% faster.", images: [
-        ["eyeai-cover.png", "Eye AI product site introducing AI-assisted diagnostic technology for clinicians.", "Product site: onboarding clinicians to the platform"],
+        ["eyeai-cover.png", "Eye AI clinician dashboard listing patients with diagnostic status and images analyzed.", "Patient dashboard: status and diagnostic queue at a glance"],
       ] },
     ],
   },
@@ -52,7 +52,7 @@ export const caseStudies = [
     overview: "A companion-guided app connecting patients, parents, and providers. Primary designer for Zoe, an AI companion inside the MyoCircle health-tech SaaS platform, plus mobile onboarding, a patient management dashboard, and provider monitoring, validated across 20+ sessions with patients, parents, and providers.",
     chapters: [
       { label: "Interaction", title: "Designing an AI companion from the ground up.", skim: "Mapped Zoe's interaction model to real care touch-points so encouragement landed as timely, not noisy.", body: "Zoe's interaction layer was built from zero: mapping interaction models to user inputs and care touch-points so encouragement felt timely rather than noisy. The work lifted exercise tutorial completion by 28% and weekly engagement by 30%.", images: [
-        ["myocircle-cover.png", "MyoCircle mobile app across three phones, an AI-companion health app with a gamified breathe, sleep and grow theme.", "MyoCircle: the product Zoe lives inside"],
+        ["myocircle-interaction.png", "MyoCircle exercise screen with Zoe's congratulations card after a completed exercise, awarding points.", "Zoe's encouragement moment: instant positive feedback after each exercise"],
       ] },
       { label: "System", title: "A library the whole team could build with.", skim: "A 100+ component Figma library PMs and engineers prototyped with on their own.", body: "A 100+ component Figma library became the shared language of the product team, adopted by product managers and engineers for independent prototyping, which kept design quality consistent even when design wasn't in the room." },
       { label: "Validation", title: "Tested with patients, parents, and providers.", skim: "20+ sessions across three user groups; parent onboarding drop-off fell 20%.", body: "Twenty-plus usability testing and heuristic evaluation sessions across all three user groups surfaced where onboarding lost people, cutting drop-off among parents by 20% and grounding every major flow in observed behaviour." },
