@@ -1784,7 +1784,9 @@ figcaption {
   columns: 3 260px;
   column-gap: 1.3rem;
 }
-.shot-item { display: block; break-inside: avoid; margin-bottom: 1.3rem; }
+/* Assemble wraps each figure in its own .assemble-item motion div — that's
+   the actual column child now, not a .shot-item we render ourselves. */
+.shot-grid .assemble-item { display: block; break-inside: avoid; margin-bottom: 1.3rem; }
 .shot {
   margin: 0;
   border: 1px solid var(--line);

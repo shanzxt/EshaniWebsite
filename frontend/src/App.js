@@ -26,6 +26,7 @@ import "./App.css";
 import Preloader from "./components/site/Preloader";
 import AvatarHero from "./components/ui/AvatarHero";
 import MacBookScroll from "./components/devices/MacBookScroll";
+import Assemble from "./components/devices/Assemble";
 
 /* ========================================================================
    Content
@@ -87,10 +88,14 @@ const tools = [
 /* A denser wall of real screens, dropped between the two lead case studies —
    more of the actual work visible without a click-through, Brandon Lee
    Designs-style. Rendered as CSS-column masonry so each image keeps its
-   native aspect ratio instead of being cropped into a uniform tile. */
+   native aspect ratio instead of being cropped into a uniform tile.
+   eyeai-dashboard.png is a lower-res, drop-shadowed crop of this same
+   screen — eyeai-cover.png is the clean, full-resolution version, so that's
+   what belongs here. myocircle-profile.png was dropped: its 3-phone
+   composite is nearly 2.5x taller than everything else and dominated the
+   grid awkwardly. */
 const shots = [
-  ["eyeai-dashboard.png", "EYE AI clinician dashboard listing patients, images analyzed, and diagnostic status.", "Onward Technologies · EYE AI", "Clinician dashboard: patients and diagnostic queue"],
-  ["myocircle-profile.png", "MyoCircle profile screen with streak, daily score, league, XP, and a monthly badges and achievements grid.", "OptraHealth · MyoCircle", "Componentized: profile, badges, and progress"],
+  ["eyeai-cover.png", "EYE AI clinician dashboard listing patients, images analyzed, and diagnostic status.", "Onward Technologies · EYE AI", "Clinician dashboard: patients and diagnostic queue"],
   ["myocircle-interaction.png", "MyoCircle exercise screen with Zoe's congratulations card after a completed exercise, awarding points.", "OptraHealth · MyoCircle", "Zoe's encouragement moment, mid-exercise"],
   ["travelogue-tripdetail.png", "Travelogue trip detail screen with people, map locations, and an itinerary hub.", "Travelogue", "One trip: people, places, and itinerary in one hub"],
   ["myocircle-day1.png", "MyoCircle Day 1 exercise screen with a guided video, sets and reps tracking, and a Start Exercise button.", "OptraHealth · MyoCircle", "Where a session starts"],
@@ -323,7 +328,7 @@ function CaseStudy({ go }) {
           </Reveal>
           <div className="chapter-art">
             <MacBookScroll
-              src={IMG("eyeai-dashboard.png")}
+              src={IMG("eyeai-cover.png")}
               alt="Eye AI clinician dashboard listing patients with diagnostic status and images analyzed."
               caption="Patient dashboard: status and diagnostic queue at a glance"
               testId="case-image-cover"
@@ -687,16 +692,25 @@ export default function App() {
                 </p>
               </Reveal>
             </div>
-            <div className="shot-grid">
+            {/* Plain <img>, not Wipe — Assemble already supplies the entrance
+                motion, so a second clip-path reveal on top of it would just
+                fight the fly-in. */}
+            <Assemble className="shot-grid" spread={220} swirl={10} stagger={0.3}>
               {shots.map(([src, alt, tag, cap], i) => (
-                <Reveal className="shot-item" delay={(i % 3) * 0.08} key={src}>
-                  <figure className="shot" data-testid={`gallery-shot-${i}`}>
-                    <Wipe src={IMG(src)} alt={alt} testId={`gallery-shot-img-${i}`} />
-                    <figcaption><b>{tag}</b>{cap}</figcaption>
-                  </figure>
-                </Reveal>
+                <figure className="shot" data-testid={`gallery-shot-${i}`} key={src}>
+                  <div className="wipe">
+                    <img
+                      src={IMG(src)}
+                      alt={alt}
+                      loading="lazy"
+                      decoding="async"
+                      data-testid={`gallery-shot-img-${i}`}
+                    />
+                  </div>
+                  <figcaption><b>{tag}</b>{cap}</figcaption>
+                </figure>
               ))}
-            </div>
+            </Assemble>
           </div>
         </section>
 
