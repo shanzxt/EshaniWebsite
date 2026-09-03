@@ -1332,6 +1332,11 @@ figcaption {
   max-width: 56ch;
 }
 
+.cs-cover-section { padding-top: clamp(2.5rem, 5vw, 4rem); }
+.cs-cover { border: 1px solid var(--line); border-radius: 4px; overflow: hidden; background: var(--surface); }
+.cs-cover .wipe { aspect-ratio: 4 / 3; }
+.cs-cover .wipe img { object-fit: cover; }
+
 .cs-chapter { padding-top: clamp(3.5rem, 7vw, 6rem); }
 .cs-chapter h2 {
   font-family: var(--font-display);

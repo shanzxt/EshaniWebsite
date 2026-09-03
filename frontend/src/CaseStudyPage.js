@@ -138,6 +138,20 @@ export default function CaseStudyPage() {
           )}
         </section>
 
+        {study.cover && (
+          <section className="cs-cover-section container">
+            <Reveal>
+              <figure className="cs-cover" data-testid="case-cover">
+                <Wipe
+                  src={IMG(study.cover[0])}
+                  alt={study.cover[1]}
+                  testId="case-cover-image"
+                />
+              </figure>
+            </Reveal>
+          </section>
+        )}
+
         {study.chapters.map((ch, i) => (
           <section className="cs-chapter container" key={ch.label} data-testid={`case-chapter-${i + 1}`}>
             <Reveal>

@@ -739,7 +739,7 @@ export default function App() {
                   </div>
                   <div className="proj-body">
                     <div>
-                      <h3>Travelogue</h3>
+                      <h3 data-cursor="Travelogue" data-cursor-img={IMG("travelogue-login-thumb.png")}>Travelogue</h3>
                       <p className="lead-role">Product Designer · Personal case study · 2025</p>
                     </div>
                     <p className="summary">

@@ -52,10 +52,15 @@ export const caseStudies = [
     overview: "A companion-guided app connecting patients, parents, and providers. Primary designer for Zoe, an AI companion inside the MyoCircle health-tech SaaS platform, plus mobile onboarding, a patient management dashboard, and provider monitoring, validated across 20+ sessions with patients, parents, and providers.",
     chapters: [
       { label: "Interaction", title: "Designing an AI companion from the ground up.", skim: "Mapped Zoe's interaction model to real care touch-points so encouragement landed as timely, not noisy.", body: "Zoe's interaction layer was built from zero: mapping interaction models to user inputs and care touch-points so encouragement felt timely rather than noisy. The work lifted exercise tutorial completion by 28% and weekly engagement by 30%.", images: [
-        ["myocircle-interaction.png", "MyoCircle exercise screen with Zoe's congratulations card after a completed exercise, awarding points.", "Zoe's encouragement moment: instant positive feedback after each exercise"],
+        ["myocircle-day1.png", "MyoCircle Day 1 exercise screen with a guided video, sets and reps tracking, and a Start Exercise button.", "Where a session starts: guided video, sets, and reps"],
+        ["myocircle-interaction.png", "MyoCircle exercise screen with Zoe's congratulations card after a completed exercise, awarding points.", "Where it ends: Zoe's encouragement moment"],
       ] },
-      { label: "System", title: "A library the whole team could build with.", skim: "A 100+ component Figma library PMs and engineers prototyped with on their own.", body: "A 100+ component Figma library became the shared language of the product team, adopted by product managers and engineers for independent prototyping, which kept design quality consistent even when design wasn't in the room." },
-      { label: "Validation", title: "Tested with patients, parents, and providers.", skim: "20+ sessions across three user groups; parent onboarding drop-off fell 20%.", body: "Twenty-plus usability testing and heuristic evaluation sessions across all three user groups surfaced where onboarding lost people, cutting drop-off among parents by 20% and grounding every major flow in observed behaviour." },
+      { label: "System", title: "A library the whole team could build with.", skim: "A 100+ component Figma library PMs and engineers prototyped with on their own.", body: "A 100+ component Figma library became the shared language of the product team, adopted by product managers and engineers for independent prototyping, which kept design quality consistent even when design wasn't in the room. Profile, badges, and progress components are one small slice of it.", images: [
+        ["myocircle-profile.png", "MyoCircle profile screen with streak, daily score, league, XP, and a monthly badges and achievements grid.", "Componentized: profile, badges, and progress states"],
+      ] },
+      { label: "Validation", title: "Tested with patients, parents, and providers.", skim: "20+ sessions across three user groups; parent onboarding drop-off fell 20%.", body: "Twenty-plus usability testing and heuristic evaluation sessions across all three user groups surfaced where onboarding lost people, cutting drop-off among parents by 20% and grounding every major flow in observed behaviour.", images: [
+        ["myocircle-level13.png", "MyoCircle workout progress screen showing Level 13, 25% progress, and the Day 1 exercise video queue.", "What sessions validated: level progress and the exercise queue"],
+      ] },
     ],
   },
   {
@@ -70,12 +75,14 @@ export const caseStudies = [
     tags: ["Personal project", "Mobile UX", "Research-led"],
     metrics: [["08", "Traveler interviews"], ["05", "Unmet needs mapped"]],
     overview: "Trip planning lives scattered across notes, maps, documents, and group chats. Travelogue is a self-initiated concept that consolidates it all, upcoming trips, itineraries, documents, and the people coming along, into one calm mobile home.",
+    cover: ["travelogue-cover.png", "Travelogue home feed and a group trip hub shown side by side on two phones."],
     chapters: [
       { label: "Research", title: "What travelers actually ask for.", skim: "Eight interviews produced five unmet needs, every feature in the concept traces back to one of them.", body: "Informal interviews with travelers surfaced a consistent set of unmet needs: offline access for places without internet, one-stop consolidation of bookings and plans, easier group coordination, expense tracking, and a way to document trips as they happen. Every feature in the concept traces back to one of these quotes.", images: [
         ["travelogue-research.png", "Research board of eight traveler quotes covering offline maps, one-stop planning, group coordination and expense tracking.", "Research synthesis: eight traveler interviews"],
       ] },
       { label: "Concept", title: "A trip hub, not another list app.", skim: "Each trip becomes one hub: people, route, itinerary, documents, gallery.", body: "Each trip becomes a hub: the people coming, the locations on a map, an itinerary nexus with dates and details, documents one tap away, and a shared gallery. Group trips stop living in chat threads; everyone sees the same plan.", images: [
-        ["travelogue-trip.png", "Travelogue trip detail screen showing people, locations on a map, itinerary hub, documents and gallery.", "Trip hub: people, route, itinerary, documents"],
+        ["travelogue-login.png", "Travelogue sign-in screen with the compass mark and social sign-in options.", "Entry point: sign up, log in, or connect socials"],
+        ["travelogue-tripdetail.png", "Travelogue trip detail screen showing people, a locations map, itinerary hub, documents, trip planner, and gallery.", "Trip hub: people, route, itinerary, documents, gallery"],
       ], phone: true },
       { label: "Interface", title: "Calm, glanceable, travel-ready.", skim: "Home opens on a countdown and contextual nudges rather than an empty search field.", body: "The home feed opens with a countdown to the next trip, upcoming trip cards with ratings and reviews, and contextual nudges: nearby cafés in the morning, wishlist check-offs in the afternoon. A deep-green palette and large imagery keep it feeling like travel, not admin.", images: [
         ["travelogue-home.png", "Travelogue home feed with greeting, solo trip countdown, upcoming trips carousel and nearby cafés.", "Home: countdown, upcoming trips, nearby"],
