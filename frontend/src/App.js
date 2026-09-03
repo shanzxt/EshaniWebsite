@@ -84,6 +84,19 @@ const tools = [
   ["axure", "Axure RP"], ["html5", "HTML5"], ["javascript", "JavaScript"], ["perplexity", "Perplexity"],
 ];
 
+/* A denser wall of real screens, dropped between the two lead case studies —
+   more of the actual work visible without a click-through, Brandon Lee
+   Designs-style. Rendered as CSS-column masonry so each image keeps its
+   native aspect ratio instead of being cropped into a uniform tile. */
+const shots = [
+  ["eyeai-dashboard.png", "EYE AI clinician dashboard listing patients, images analyzed, and diagnostic status.", "Onward Technologies · EYE AI", "Clinician dashboard: patients and diagnostic queue"],
+  ["myocircle-profile.png", "MyoCircle profile screen with streak, daily score, league, XP, and a monthly badges and achievements grid.", "OptraHealth · MyoCircle", "Componentized: profile, badges, and progress"],
+  ["myocircle-interaction.png", "MyoCircle exercise screen with Zoe's congratulations card after a completed exercise, awarding points.", "OptraHealth · MyoCircle", "Zoe's encouragement moment, mid-exercise"],
+  ["travelogue-tripdetail.png", "Travelogue trip detail screen with people, map locations, and an itinerary hub.", "Travelogue", "One trip: people, places, and itinerary in one hub"],
+  ["myocircle-day1.png", "MyoCircle Day 1 exercise screen with a guided video, sets and reps tracking, and a Start Exercise button.", "OptraHealth · MyoCircle", "Where a session starts"],
+  ["myocircle-level13.png", "MyoCircle workout progress screen showing Level 13, 25% progress, and the Day 1 exercise video queue.", "OptraHealth · MyoCircle", "Progress and the exercise queue"],
+];
+
 const navItems = [
   ["top", "Home"],
   ["work", "Work"],
@@ -310,7 +323,7 @@ function CaseStudy({ go }) {
           </Reveal>
           <div className="chapter-art">
             <MacBookScroll
-              src={IMG("eyeai-cover.png")}
+              src={IMG("eyeai-dashboard.png")}
               alt="Eye AI clinician dashboard listing patients with diagnostic status and images analyzed."
               caption="Patient dashboard: status and diagnostic queue at a glance"
               testId="case-image-cover"
@@ -657,6 +670,33 @@ export default function App() {
               </Reveal>
             </div>
             <CaseStudy go={go} />
+          </div>
+        </section>
+
+        {/* ---------- a closer look: real screens, no click-through ---------- */}
+        <section className="section" id="gallery" aria-label="Selected screens">
+          <div className="container">
+            <div className="section-head">
+              <div>
+                <Reveal><p className="section-label">A closer look</p></Reveal>
+                <SplitText as="h2" text="Real screens, not just covers." testId="gallery-heading" delay={0.05} />
+              </div>
+              <Reveal delay={0.15}>
+                <p className="desc">
+                  A handful of the actual interfaces behind the work above.
+                </p>
+              </Reveal>
+            </div>
+            <div className="shot-grid">
+              {shots.map(([src, alt, tag, cap], i) => (
+                <Reveal className="shot-item" delay={(i % 3) * 0.08} key={src}>
+                  <figure className="shot" data-testid={`gallery-shot-${i}`}>
+                    <Wipe src={IMG(src)} alt={alt} testId={`gallery-shot-img-${i}`} />
+                    <figcaption><b>{tag}</b>{cap}</figcaption>
+                  </figure>
+                </Reveal>
+              ))}
+            </div>
           </div>
         </section>
 
