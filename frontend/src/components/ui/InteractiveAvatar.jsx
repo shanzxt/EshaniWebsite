@@ -2,12 +2,16 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 import { motion, useSpring, useMotionValue, useTransform, useReducedMotion } from "framer-motion";
 
 /**
- * InteractiveAvatar — Elegant Bun Hairstyle with Two Face-Framing Strands
+ * InteractiveAvatar — Loose, Flowing Hair with Face-Framing Waves
  *
  * Design:
- *  - Classic, chic hair bun at the crown/back
- *  - Smooth swept-back hairline framing the forehead
- *  - Two delicate wavy tendrils/strands falling gracefully in front past cheeks to shoulders
+ *  - Hair worn down: a soft wavy mass falling behind the shoulders, layered
+ *    with lighter under-tones for depth (base mass → mid-tone → highlight,
+ *    per standard hair-illustration layering)
+ *  - Smooth swept-back crown framing the forehead, unchanged from before
+ *  - Four face-framing locks (two back, two front) with varying width and
+ *    wavy edges instead of a single uniform tendril, each swaying gently
+ *    and independently so the whole head reads as in motion
  *  - Prominent sparkling silver jhumkas dangling with reactive physics
  *  - Real-time cursor tracking eyes & natural blinking
  */
@@ -40,9 +44,9 @@ export default function InteractiveAvatar({
   const headX = useTransform(smoothX, [-1, 1], [-5, 5]);
   const headY = useTransform(smoothY, [-1, 1], [-3.5, 3.5]);
 
-  // Bun and Tendril Strand Parallax
-  const bunX = useTransform(smoothX, [-1, 1], [2.5, -2.5]);
-  const tendrilX = useTransform(smoothX, [-1, 1], [-6, 6]);
+  // Hair Parallax — back mass drifts opposite the cursor, front locks lead it
+  const hairBackX = useTransform(smoothX, [-1, 1], [2.5, -2.5]);
+  const hairFrontX = useTransform(smoothX, [-1, 1], [-6, 6]);
 
   // Jhumka Reactive Physics
   const earringLeftRotate = useTransform(smoothX, [-1, 1], [-8, 12]);
@@ -253,10 +257,10 @@ export default function InteractiveAvatar({
           </radialGradient>
 
           {/* Hair Bun & Strands Gradients */}
-          <linearGradient id="ia-bun" gradientUnits="userSpaceOnUse" x1="160" y1="20" x2="280" y2="120">
+          <linearGradient id="ia-bun" gradientUnits="userSpaceOnUse" x1="220" y1="70" x2="220" y2="470">
             <stop offset="0%" stopColor="#32343F" />
-            <stop offset="50%" stopColor="#22242D" />
-            <stop offset="100%" stopColor="#14151B" />
+            <stop offset="35%" stopColor="#22242D" />
+            <stop offset="100%" stopColor="#121319" />
           </linearGradient>
           <linearGradient id="ia-hairFront" gradientUnits="userSpaceOnUse" x1="120" y1="70" x2="330" y2="430">
             <stop offset="0%" stopColor="#353742" />
@@ -305,29 +309,61 @@ export default function InteractiveAvatar({
           </clipPath>
         </defs>
 
-        {/* ---------- LAYER 1 — TOP/BACK HAIR BUN ---------- */}
-        <motion.g style={reduced ? {} : { x: bunX }}>
-          <ellipse cx="220" cy="62" rx="52" ry="42" fill="url(#ia-bun)" />
-          <path
-            d="M178 72 C178 38 262 38 262 72 C262 86 178 86 178 72 Z"
-            fill="url(#ia-bun)"
-          />
-          <path
-            d="M185 58 C198 42 242 42 255 58"
-            stroke="url(#ia-hairLite)"
-            strokeWidth="3.5"
-            strokeLinecap="round"
-            fill="none"
-            opacity="0.6"
-          />
-          <path
-            d="M194 70 C206 58 234 58 246 70"
-            stroke="url(#ia-hairLite)"
-            strokeWidth="2.8"
-            strokeLinecap="round"
-            fill="none"
-            opacity="0.5"
-          />
+        {/* ---------- LAYER 1 — LOOSE HAIR FALLING BEHIND THE SHOULDERS ----------
+             Two mirrored locks (not one symmetric blob) so each can sway on
+             its own timing — real hair never moves as a single rigid mass.
+             Each lock is a base-tone shape plus a lighter highlight stroke
+             traced just inside its outer edge, the same base → highlight
+             layering used for painted hair. */}
+        <motion.g style={reduced ? {} : { x: hairBackX }}>
+          <motion.g
+            style={{ transformOrigin: "222px 78px" }}
+            animate={reduced ? undefined : { rotate: [-1.6, 1.4, -1.6] }}
+            transition={{ duration: 7.5, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <path
+              d="M220 70 C250 68 280 78 298 108 C316 138 318 178 306 214
+                 C296 244 310 268 322 300 C332 328 328 358 314 384
+                 C320 410 332 434 322 460 C316 478 296 486 284 470
+                 C274 456 280 434 270 410 C260 384 254 356 258 326
+                 C246 296 232 268 240 238 C226 206 224 172 222 140
+                 C220 116 218 92 220 70 Z"
+              fill="url(#ia-bun)"
+            />
+            <path
+              d="M232 84 C266 96 288 128 288 168 C288 202 274 228 280 258
+                 C286 292 302 320 300 352 C298 378 288 402 292 426"
+              stroke="url(#ia-hairLite)"
+              strokeWidth="2.6"
+              strokeLinecap="round"
+              fill="none"
+              opacity="0.45"
+            />
+          </motion.g>
+          <motion.g
+            style={{ transformOrigin: "218px 78px" }}
+            animate={reduced ? undefined : { rotate: [1.5, -1.7, 1.5] }}
+            transition={{ duration: 8.2, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
+          >
+            <path
+              d="M220 70 C190 68 160 78 142 108 C124 138 122 178 134 214
+                 C144 244 130 268 118 300 C108 328 112 358 126 384
+                 C120 410 108 434 118 460 C124 478 144 486 156 470
+                 C166 456 160 434 170 410 C180 384 186 356 182 326
+                 C194 296 208 268 200 238 C214 206 216 172 218 140
+                 C220 116 222 92 220 70 Z"
+              fill="url(#ia-bun)"
+            />
+            <path
+              d="M208 84 C174 96 152 128 152 168 C152 202 166 228 160 258
+                 C154 292 138 320 140 352 C142 378 152 402 148 426"
+              stroke="url(#ia-hairLite)"
+              strokeWidth="2.6"
+              strokeLinecap="round"
+              fill="none"
+              opacity="0.45"
+            />
+          </motion.g>
         </motion.g>
 
         {/* ---------- LAYER 2 — NECK, SHOULDERS, KURTA ---------- */}
@@ -614,14 +650,14 @@ export default function InteractiveAvatar({
           </g>
         </motion.g>
 
-        {/* ---------- LAYER 4 — SWEPT-BACK CROWN + TWO STRANDS COMING FORWARD ---------- */}
-        <motion.g style={reduced ? {} : { x: tendrilX }}>
+        {/* ---------- LAYER 4 — SWEPT-BACK CROWN + FOUR FACE-FRAMING WAVES ---------- */}
+        <motion.g style={reduced ? {} : { x: hairFrontX }}>
           {/* Swept-Back Front Hair Crown Framing Face */}
           <path
-            d="M148 192 
-               C140 110 172 72 220 72 
-               C268 72 300 110 292 192 
-               C278 152 254 135 220 135 
+            d="M148 192
+               C140 110 172 72 220 72
+               C268 72 300 110 292 192
+               C278 152 254 135 220 135
                C186 135 162 152 148 192 Z"
             fill="url(#ia-hairFront)"
           />
@@ -643,48 +679,64 @@ export default function InteractiveAvatar({
             fill="none"
             opacity="0.55"
           />
+          {/* A couple of loose flyaway hairs at the part — small, thin, real
+              hair is never perfectly smooth at the edges. */}
+          <path d="M204 78 C198 88 196 100 200 112" stroke="#3A3D49" strokeWidth="1.4" strokeLinecap="round" fill="none" opacity="0.5" />
+          <path d="M240 80 C246 90 248 102 244 114" stroke="#3A3D49" strokeWidth="1.4" strokeLinecap="round" fill="none" opacity="0.5" />
 
           {/* =========================================================
-              TWO ELEGANT FACE-FRAMING CURLY/WAVY STRANDS
+              FOUR FACE-FRAMING WAVY LOCKS — two wider ones falling to the
+              shoulders, two shorter ones layered in front for depth, each
+              swaying on its own timing so the hair reads as loose, not
+              like two static tendrils glued to the face.
               ========================================================= */}
 
-          {/* --- LEFT STRAND --- */}
-          <path
-            d="M174 138 
-               C160 170 152 220 158 270 
-               C164 315 152 355 146 385 
-               C144 394 154 396 157 388 
-               C166 358 174 318 168 270 
-               C162 225 170 175 182 142 Z"
-            fill="url(#ia-hairFront)"
-          />
-          <path
-            d="M176 150 C162 190 158 245 164 295 C168 335 158 365 152 385"
-            stroke="url(#ia-hairLite)"
-            strokeWidth="2.4"
-            strokeLinecap="round"
-            fill="none"
-            opacity="0.65"
-          />
+          {/* --- LEFT, LONG LOCK --- */}
+          <motion.g
+            style={{ transformOrigin: "178px 140px" }}
+            animate={reduced ? undefined : { rotate: [-2.2, 1.8, -2.2] }}
+            transition={{ duration: 6.4, repeat: Infinity, ease: "easeInOut", delay: 0.15 }}
+          >
+            <path
+              d="M172 136 C152 160 138 200 140 244 C142 284 122 312 116 352
+                 C112 380 128 404 118 432 C112 452 128 466 140 452
+                 C150 440 144 414 152 388 C160 358 172 322 166 284
+                 C160 248 172 208 184 176 C190 160 182 146 172 136 Z"
+              fill="url(#ia-hairFront)"
+            />
+            <path
+              d="M164 150 C148 182 138 220 142 258 C146 292 128 316 122 350"
+              stroke="url(#ia-hairLite)"
+              strokeWidth="2.3"
+              strokeLinecap="round"
+              fill="none"
+              opacity="0.6"
+            />
+          </motion.g>
 
-          {/* --- RIGHT STRAND --- */}
-          <path
-            d="M266 138 
-               C280 170 288 220 282 270 
-               C276 315 288 355 294 385 
-               C296 394 286 396 283 388 
-               C274 358 266 318 272 270 
-               C278 225 270 175 258 142 Z"
-            fill="url(#ia-hairFront)"
-          />
-          <path
-            d="M264 150 C278 190 282 245 276 295 C272 335 282 365 288 385"
-            stroke="url(#ia-hairLite)"
-            strokeWidth="2.4"
-            strokeLinecap="round"
-            fill="none"
-            opacity="0.65"
-          />
+          {/* --- RIGHT, LONG LOCK --- */}
+          <motion.g
+            style={{ transformOrigin: "262px 140px" }}
+            animate={reduced ? undefined : { rotate: [2.1, -1.9, 2.1] }}
+            transition={{ duration: 6.9, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
+          >
+            <path
+              d="M268 136 C288 160 302 200 300 244 C298 284 318 312 324 352
+                 C328 380 312 404 322 432 C328 452 312 466 300 452
+                 C290 440 296 414 288 388 C280 358 268 322 274 284
+                 C280 248 268 208 256 176 C250 160 258 146 268 136 Z"
+              fill="url(#ia-hairFront)"
+            />
+            <path
+              d="M276 150 C292 182 302 220 298 258 C294 292 312 316 318 350"
+              stroke="url(#ia-hairLite)"
+              strokeWidth="2.3"
+              strokeLinecap="round"
+              fill="none"
+              opacity="0.6"
+            />
+          </motion.g>
+
         </motion.g>
 
         {/* ---------- LAYER 5 — JHUMKAS ---------- */}
